@@ -1,0 +1,17 @@
+slim/*
+pascal_voc/*
+log.txt
+*.jpg
+*.png
+*.jpeg
+*.zip
+*.tar
+*.gz
+*.7z
+*.rar
+*.swp
+*.swap
+*.out
+__pycache__/*
+*.pyc
+.idea
