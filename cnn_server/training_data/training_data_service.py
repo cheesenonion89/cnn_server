@@ -99,7 +99,7 @@ def write_to_protobuffer(bot_id: int, net: str):
 	if not os.path.exists(bot_protobuf_dir):
 		os.mkdir(bot_protobuf_dir)
 
-	convert_training_data.run()
+	convert_training_data.run(bot_training_data_dir, bot_protobuf_dir)
 
 	return True
 
