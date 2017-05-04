@@ -14,7 +14,7 @@ BOT_TRAINING_DATA_DIR = dirs.get_training_data_dir(BOT_ID)
 BOT_PROTOBUF_DIR = dirs.get_protobuf_dir(BOT_ID)
 
 
-class TestTrainingDataService(TestCase):
+class TestTraining_data_service(TestCase):
 	def test_validate_training_data(self):
 
 		# Read the ZIP Files
@@ -40,6 +40,7 @@ class TestTrainingDataService(TestCase):
 		if os.path.exists(BOT_TRAINING_DATA_DIR):
 			shutil.rmtree(BOT_TRAINING_DATA_DIR)
 
+
 		service.create_training_data_dir(BOT_ID, os.path.join(FILES_DIR, 'valid_trainingdata.zip'))
 
 		self.assertTrue(os.listdir(TRAINING_DATA_DIR), 'No data in training data dir after extraction')
@@ -59,7 +60,7 @@ class TestTrainingDataService(TestCase):
 			shutil.rmtree(BOT_TRAINING_DATA_DIR)
 
 		service.create_training_data_dir(BOT_ID, os.path.join(FILES_DIR, 'flower_photos.zip'))
-		service.write_to_protobuffer(BOT_ID, 'name')
+		service.write_to_protobuffer(BOT_ID)
 
 		# Check if the bot directory has been created
 		self.assertTrue(os.path.isdir(BOT_TRAINING_DATA_DIR))

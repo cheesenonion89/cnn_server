@@ -1,11 +1,10 @@
-from zipfile import ZipFile
 import zipfile
-
-from slim.datasets import convert_training_data
+from zipfile import ZipFile
 
 import os
 
 import cnn_server.server.file_service as dirs
+from slim.datasets import convert_training_data
 
 
 def validate_training_data(file):
@@ -81,7 +80,7 @@ def create_training_data_dir(bot_id: int, training_data_file):
 	return True
 
 
-def write_to_protobuffer(bot_id: int, net: str):
+def write_to_protobuffer(bot_id: int):
 	"""
 	
 	:param bot_id: 
@@ -101,13 +100,4 @@ def write_to_protobuffer(bot_id: int, net: str):
 
 	convert_training_data.run(bot_training_data_dir, bot_protobuf_dir)
 
-	return True
-
-
-def register_training_data(bot_id: int):
-	"""
-	
-	:param bot_id: 
-	:return: 
-	"""
 	return True

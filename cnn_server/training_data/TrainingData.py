@@ -27,4 +27,4 @@ class TrainingData(Resource):
 		training_data_file = request.files['file']
 		net = request.form['net']
 
-		return handler.handle_put(bot_id, training_data_file, net)
+		return handler.handle_put(bot_id, training_data_file)
