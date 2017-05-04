@@ -33,7 +33,6 @@ class TestTrainingDataService(TestCase):
 		self.assertTrue(service.validate_training_data(valid_zip))
 		self.assertEqual(1, 1)
 
-
 	def test_create_training_data_dir(self):
 		# Clear the directory first
 		if os.path.exists(BOT_TRAINING_DATA_DIR):
@@ -52,6 +51,10 @@ class TestTrainingDataService(TestCase):
 		self.assertEqual(2, n_dirs, 'wrong number of directories after file extraction')
 
 		shutil.rmtree(BOT_TRAINING_DATA_DIR)
+
+	def test_write_to_protobuffer(self):
+		service.write_to_protobuffer(1, 'name')
+		self.assertTrue(True)
 
 
 if __name__ == '__main__':

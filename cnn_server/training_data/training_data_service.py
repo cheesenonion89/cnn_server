@@ -1,6 +1,8 @@
 from zipfile import ZipFile
 import zipfile
 
+from slim.datasets import convert_training_data
+
 import os
 
 import cnn_server.server.file_service as dirs
@@ -86,6 +88,19 @@ def write_to_protobuffer(bot_id: int, net: str):
 	:param net: 
 	:return: 
 	"""
+
+	bot_training_data_dir = dirs.get_training_data_dir(bot_id)
+
+	if not os.path.exists(bot_training_data_dir):
+		return False
+
+	bot_protobuf_dir = dirs.get_protobuf_dir(bot_id)
+
+	if not os.path.exists(bot_protobuf_dir):
+		os.mkdir(bot_protobuf_dir)
+
+	convert_training_data.run()
+
 	return True
 
 
