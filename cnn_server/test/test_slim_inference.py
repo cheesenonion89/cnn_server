@@ -1,3 +1,4 @@
+import unittest
 from unittest import TestCase
 
 import numpy as np
@@ -21,7 +22,7 @@ class TestInference(TestCase):
 		self.assertEqual(expected_return_labels, len(labels), "List of labels is not as long as expected")
 		self.assertEqual(expected_return_labels, len(probabilities), "List of labels is not as long as expected")
 
-		self.assertListEqual([0.534, 0.194, 0.111], probabilities.tolist())
+		self.assertListEqual([0.534, 0.194, 0.111], probabilities)
 		self.assertListEqual(['dandelion', 'daisy', 'tulips'], labels)
 
 	# TODO: Restore CNN from a working ckpt file and also verify classification results
@@ -37,6 +38,12 @@ class TestInference(TestCase):
 															  os.path.join(tempfile.gettempdir(), temp_file.name),
 															  return_labels=1)
 
+		temp_file.close()
+
 		self.assertEqual(len(labels), len(probabilities))
 		self.assertEqual(1, len(labels))
 		self.assertEqual(1, len(probabilities))
+
+
+if __name__ == '__main__':
+	unittest.main()

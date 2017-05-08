@@ -11,7 +11,7 @@ slim = tf.contrib.slim
 
 def map_predictions_to_labels(bot_id, predictions, return_labels):
 	"""
-	
+	Utility function to map the output of the prediction endpoint to the corresponding labels
 	:param bot_id: 
 	:param predictions: 
 	:param return_labels: 
@@ -25,18 +25,19 @@ def map_predictions_to_labels(bot_id, predictions, return_labels):
 	top_n = predictions.argsort()[-return_labels:][::-1]
 
 	lbls = [labels[ndx] for ndx in top_n]
-	probabilities = predictions[top_n]
+	probabilities = predictions[top_n].tolist()
 	return lbls, probabilities
 
 
 def inference_on_image(bot_id, image_file, network_name='inception_v3', return_labels=1):
 	"""
-	
-	:param bot_id: 
-	:param image_file: 
-	:param network_name: 
-	:param return_labels: 
-	:return: 
+	Loads the corresponding model checkpoint, network function and preprocessing routine based on bot_id and network_name,
+	restores the graph and runs it to the prediction enpoint with the image as input
+	:param bot_id: bot_id, used to reference to correct model directory
+	:param image_file: reference to the temporary image file to be classified
+	:param network_name: name of the network type to be used
+	:param return_labels: number of labels to return
+	:return: the top n labels with probabilities, where n = return_labels
 	"""
 
 	# Get the model path
