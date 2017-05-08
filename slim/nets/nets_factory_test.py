@@ -21,7 +21,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 
-from nets import nets_factory
+from slim.nets import nets_factory
 
 slim = tf.contrib.slim
 

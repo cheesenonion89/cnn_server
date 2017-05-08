@@ -3,7 +3,7 @@ import os
 PROJECT_ROOT_DIR = '/home/markus/projects/cnn_server/'
 TRAINING_DATA_DIR = os.path.join(PROJECT_ROOT_DIR, 'training_data')
 PROTOBUF_DIR = os.path.join(PROJECT_ROOT_DIR, 'protobuf')
-MODEL_DIR = '../models'
+MODEL_DIR = os.path.join(PROJECT_ROOT_DIR, 'model')
 
 FOLDER_PREFIX = 'bot'
 
