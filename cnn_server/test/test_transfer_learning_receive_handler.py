@@ -7,16 +7,18 @@ import os
 import tempfile
 
 import cnn_server.classification.classification_receive_handler as handler
-import cnn_server.transfer_learning.transfer_learning_service as service
+import cnn_server.transfer_learning.transfer_learning_receive_handler as tl_handler
 from cnn_server.server import file_service as dirs
 
 TEST_BOT_ID = 'test'
 FILES_DIR = 'files'
 
 
-class TestTransferLearningService(TestCase):
+class TestTransferLearningReceiveHandler(TestCase):
 	def test_train(self):
-		service.train(TEST_BOT_ID, test=True)
+		msg, status = tl_handler.handle_put(TEST_BOT_ID, test=True)
+
+		self.assertEqual(200, status, 'http status code is %s' % status)
 
 		bot_model_dir = dirs.get_model_data_dir(TEST_BOT_ID)
 
