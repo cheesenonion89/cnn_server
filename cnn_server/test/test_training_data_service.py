@@ -14,7 +14,7 @@ BOT_TRAINING_DATA_DIR = dirs.get_training_data_dir(BOT_ID)
 BOT_PROTOBUF_DIR = dirs.get_protobuf_dir(BOT_ID)
 
 
-class TestTraining_data_service(TestCase):
+class TestTrainingDatService(TestCase):
 	def test_validate_training_data(self):
 
 		# Read the ZIP Files
@@ -39,7 +39,6 @@ class TestTraining_data_service(TestCase):
 		# Clear the directory first
 		if os.path.exists(BOT_TRAINING_DATA_DIR):
 			shutil.rmtree(BOT_TRAINING_DATA_DIR)
-
 
 		service.create_training_data_dir(BOT_ID, os.path.join(FILES_DIR, 'valid_trainingdata.zip'))
 

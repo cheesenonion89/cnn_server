@@ -64,17 +64,11 @@ _IGNORE_MISSING_VARS = False
 
 
 def _configure_learning_rate(num_samples_per_epoch, global_step):
-	"""Configures the learning rate.
-  
-	Args:
-	  num_samples_per_epoch: The number of samples in each epoch of training.
-	  global_step: The global_step tensor.
-  
-	Returns:
-	  A `Tensor` representing the learning rate.
-  
-	Raises:
-	  ValueError: if
+	"""
+	
+	:param num_samples_per_epoch: 
+	:param global_step: 
+	:return: 
 	"""
 	decay_steps = int(num_samples_per_epoch / _BATCH_SIZE *
 					  _NUM_EPOCHS_PER_DECAY)
@@ -104,16 +98,10 @@ def _configure_learning_rate(num_samples_per_epoch, global_step):
 
 
 def _configure_optimizer(learning_rate):
-	"""Configures the optimizer used for training.
-  
-	Args:
-	  learning_rate: A scalar or `Tensor` learning rate.
-  
-	Returns:
-	  An instance of an optimizer.
-  
-	Raises:
-	  ValueError: if _OPTIMIZER is not recognized.
+	"""
+	
+	:param learning_rate: 
+	:return: 
 	"""
 	if _OPTIMIZER == 'adadelta':
 		optimizer = tf.train.AdadeltaOptimizer(
@@ -155,24 +143,22 @@ def _configure_optimizer(learning_rate):
 	return optimizer
 
 
-def _get_init_fn(model_dir, protobuf_dir):
-	"""Returns a function run by the chief worker to warm-start the training.
-  
-	Note that the init_fn is only run when initializing the model during the very
-	first global step.
-  
-	Returns:
-	  An init function run by the supervisor.
+def _get_init_fn(root_model_dir, bot_model_dir, protobuf_dir):
+	"""
+	
+	:param model_dir: 
+	:param protobuf_dir: 
+	:return: 
 	"""
 	if protobuf_dir is None:
 		return None
 
-	# Warn the user if a checkpoint exists in the train_dir. Then we'll be
+	# Warn the user if a checkpoint exists in the bot_model_dir. Then we'll be
 	# ignoring the checkpoint anyway.
-	if tf.train.latest_checkpoint(model_dir):
+	if tf.train.latest_checkpoint(bot_model_dir):
 		tf.logging.info(
 			'Ignoring --checkpoint_path because a checkpoint already exists in %s'
-			% model_dir)
+			% bot_model_dir)
 		return None
 
 	exclusions = []
@@ -191,10 +177,10 @@ def _get_init_fn(model_dir, protobuf_dir):
 		if not excluded:
 			variables_to_restore.append(var)
 
-	if tf.gfile.IsDirectory(model_dir):
-		checkpoint_path = tf.train.latest_checkpoint(model_dir)
+	if tf.gfile.IsDirectory(root_model_dir):
+		checkpoint_path = tf.train.latest_checkpoint(root_model_dir)
 	else:
-		checkpoint_path = model_dir
+		checkpoint_path = root_model_dir
 
 	tf.logging.info('Fine-tuning from %s' % checkpoint_path)
 
@@ -205,10 +191,9 @@ def _get_init_fn(model_dir, protobuf_dir):
 
 
 def _get_variables_to_train():
-	"""Returns a list of variables to train.
-  
-	Returns:
-	  A list of variables to train by the optimizer.
+	"""
+	
+	:return: 
 	"""
 	if _TRAINABLE_SCOPES is None:
 		return tf.trainable_variables()
@@ -222,8 +207,19 @@ def _get_variables_to_train():
 	return variables_to_train
 
 
-def transfer_learning(model_dir, protobuf_dir, model_name='inception_v3', dataset_split_name='train',
-					  dataset_name='bot'):
+def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='inception_v3', dataset_split_name='train',
+					  dataset_name='bot', max_number_of_steps = _MAX_NUMBER_OF_STEPS):
+	"""
+	
+	:param root_model_dir: Directory containing the root models pretrained checkpoint files
+	:param bot_model_dir: Directory where the transfer learned model's checkpoint files are written to
+	:param protobuf_dir: Directory for the dataset factory to load the bot's training data from
+	:param model_name: name of the network model for the net factory to provide the correct network and preprocesing fn
+	:param dataset_split_name: 'train' or 'validation'
+	:param dataset_name: triggers the dataset factory to load a bot dataset
+	:return: 
+	"""
+
 	tf.logging.set_verbosity(tf.logging.INFO)
 
 	with tf.Graph().as_default():
@@ -399,12 +395,12 @@ def transfer_learning(model_dir, protobuf_dir, model_name='inception_v3', datase
 		###########################
 		slim.learning.train(
 			train_tensor,
-			logdir=model_dir,
+			logdir=bot_model_dir,
 			master=_MASTER,
 			is_chief=(_TASK == 0),
-			init_fn=_get_init_fn(),
+			init_fn=_get_init_fn(root_model_dir, bot_model_dir, protobuf_dir),
 			summary_op=summary_op,
-			number_of_steps=_MAX_NUMBER_OF_STEPS,
+			number_of_steps=max_number_of_steps,
 			log_every_n_steps=_LOG_EVERY_N_STEPS,
 			save_summaries_secs=_SAVE_SUMMARRIES_SECS,
 			save_interval_secs=_SAVE_INTERNAL_SECS,

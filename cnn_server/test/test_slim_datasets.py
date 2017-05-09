@@ -14,7 +14,7 @@ BOT_TRAINING_DATA_DIR = dirs.get_training_data_dir(BOT_ID)
 FILES_DIR = 'files'
 
 
-class TestSlim_datasets(TestCase):
+class TestSlimDatasets(TestCase):
 	def test_get_number_of_classes_by_labels(self):
 		txt_labels = utils.get_number_of_classes_by_labels(BOT_PROTOBUF_DIR)
 		self.assertEqual(5, txt_labels)

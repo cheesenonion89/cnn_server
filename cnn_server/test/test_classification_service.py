@@ -11,7 +11,7 @@ FILES_DIR = 'files'
 TEST_BOT_ID = 'test'
 
 
-class TestClassification_service(TestCase):
+class TestClassificationService(TestCase):
 	def test_classify_image(self):
 		temp_file = tempfile.NamedTemporaryFile()
 		temp_file.write(

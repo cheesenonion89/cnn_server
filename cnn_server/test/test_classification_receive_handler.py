@@ -27,7 +27,7 @@ class TestClassification_receive_handler(TestCase):
 		)
 		temp_file.seek(0)
 
-		json_result = handler.handle_post(TEST_BOT_ID, temp_file.read(), return_labels=expected_return_labels)
+		json_result, status = handler.handle_post(TEST_BOT_ID, temp_file.read(), return_labels=expected_return_labels)
 
 		temp_file.close()
 

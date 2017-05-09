@@ -14,7 +14,7 @@ BOT_TRAINING_DATA_DIR = dirs.get_training_data_dir(BOT_ID)
 BOT_PROTOBUF_DIR = dirs.get_protobuf_dir(BOT_ID)
 
 
-class TestTraining_data_receive_handler(TestCase):
+class TestTrainingDataReceiveHandler(TestCase):
 	def test_handle_put(self):
 		if os.path.exists(BOT_PROTOBUF_DIR):
 			shutil.rmtree(BOT_PROTOBUF_DIR)
