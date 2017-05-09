@@ -4,8 +4,11 @@ import slim.transfer_learn_image_classifier as transfer_learning
 from cnn_server.server import file_service as dirs
 
 
-def train(bot_id: int):
-	root_model_dir = dirs.get_root_model_dir()
+def train(bot_id, max_number_of_steps=None, test=False):
+	if test:
+		root_model_dir = dirs.get_test_root_model_dir()
+	else:
+		root_model_dir = dirs.get_root_model_dir()
 	bot_model_dir = dirs.get_model_data_dir(bot_id)
 	bot_protobuf_dir = dirs.get_protobuf_dir(bot_id)
 
@@ -42,8 +45,8 @@ def train(bot_id: int):
 		protobuf_dir=bot_protobuf_dir,
 		dataset_name='bot',
 		dataset_split_name='train',
-		model_name='inception_v3'
-		# max_number_of_steps=
+		model_name='inception_v3',
+		max_number_of_steps=max_number_of_steps
 	)
 
 	# After Transfer Learning bot_model_dir must exist, not be empty and contain a checkpoint file

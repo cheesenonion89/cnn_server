@@ -17,13 +17,15 @@ FILES_DIR = 'files'
 class TestTransferLearningImageClassifier(TestCase):
 	def test_transfer_learning(self):
 		# Root model to initialize from
-		root_model_dir = dirs.get_root_model_dir()
+		root_model_dir = dirs.get_test_root_model_dir()
 		if not os.listdir(root_model_dir):
 			print('root_model_dir %s empty. Cannot start test' % root_model_dir)
 			return None
 		if not os.path.isfile(os.path.join(root_model_dir, 'checkpoint')):
 			print('No Checkpoint File in %s. Cannot start test.' % root_model_dir)
 			return None
+
+
 
 		# Folder to load the additional training data from
 		bot_protobuf_dir = dirs.get_protobuf_dir(TEST_BOT_ID)
@@ -39,7 +41,8 @@ class TestTransferLearningImageClassifier(TestCase):
 			print('bot_model_dir %s does not exist. Cannot start test' % bot_model_dir)
 			return None
 		if os.listdir(bot_model_dir):
-			print('bot_model_dir %s is not emtpy. Cannot start test.')
+			print('bot_model_dir %s is not emtpy. Cannot start test.' % bot_model_dir)
+			return None
 
 		# Just run one step to make sure checkpoint files are written appropriately
 		transfer_learning.transfer_learning(
@@ -71,18 +74,27 @@ class TestTransferLearningImageClassifier(TestCase):
 		)
 		temp_file.seek(0)
 
-		json_result = handler.handle_post(TEST_BOT_ID, temp_file.read(), return_labels=5)
+		json_result, status = handler.handle_post(TEST_BOT_ID, temp_file.read(), return_labels=5)
 		print(json_result)
 		temp_file.close()
 
 		self.assertTrue(json_result, 'Classification result is empty')
 
-		json_result, status = json.loads(json_result)
+		json_result = json.loads(json_result)
 
 		self.assertTrue(json_result['labels'], 'No labels in json result %s' % json_result)
-		self.assertTrue(json_result['predictions'], 'No predictions in json result %s' % json_result)
+		self.assertTrue(json_result['probabilities'], 'No predictions in json result %s' % json_result)
 
 		print(json_result)
+
+		# Clean the bot_model directory for next test run
+		for file in os.listdir(bot_model_dir):
+			file_path = os.path.join(bot_model_dir, file)
+			try:
+				if os.path.isfile(file_path):
+					os.unlink(file_path)
+			except Exception as e:
+				print(e)
 
 
 if __name__ == '__main__':

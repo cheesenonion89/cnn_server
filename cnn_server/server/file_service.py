@@ -26,3 +26,7 @@ def get_model_data_dir(bot_id):
 
 def get_root_model_dir():
 	return os.path.join(MODEL_DIR, 'root')
+
+
+def get_test_root_model_dir():
+	return os.path.join(MODEL_DIR, 'root_test')

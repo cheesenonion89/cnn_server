@@ -207,8 +207,9 @@ def _get_variables_to_train():
 	return variables_to_train
 
 
-def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='inception_v3', dataset_split_name='train',
-					  dataset_name='bot', max_number_of_steps = _MAX_NUMBER_OF_STEPS):
+def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='inception_v3',
+					  dataset_split_name='train',
+					  dataset_name='bot', max_number_of_steps=None):
 	"""
 	
 	:param root_model_dir: Directory containing the root models pretrained checkpoint files
@@ -219,6 +220,9 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
 	:param dataset_name: triggers the dataset factory to load a bot dataset
 	:return: 
 	"""
+
+	if not max_number_of_steps:
+		max_number_of_steps = _MAX_NUMBER_OF_STEPS
 
 	tf.logging.set_verbosity(tf.logging.INFO)
 
