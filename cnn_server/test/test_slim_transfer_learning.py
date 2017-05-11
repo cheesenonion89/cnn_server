@@ -47,7 +47,8 @@ class TestTransferLearningImageClassifier(TestCase):
             root_model_dir=root_model_dir,
             bot_model_dir=bot_model_dir,
             protobuf_dir=bot_protobuf_dir,
-            max_number_of_steps=1
+            max_train_time_sec=100,
+            log_every_n_steps=2
         )
 
         # Check if the root model dir is still intact
@@ -93,6 +94,8 @@ class TestTransferLearningImageClassifier(TestCase):
                     os.unlink(file_path)
             except Exception as e:
                 print(e)
+
+
 """
     def test_train(self):
         # Bot model folder to write the transfer learned model back to
@@ -112,7 +115,7 @@ class TestTransferLearningImageClassifier(TestCase):
         if not os.listdir(bot_protobuf_dir):
             print("bot_protobuf_dir %s is empty. Cannot start test." % bot_protobuf_dir)
 
-        transfer_learning.train(bot_model_dir=bot_model_dir, protobuf_dir=bot_protobuf_dir, max_number_of_steps=1)
+        transfer_learning.train(bot_model_dir=bot_model_dir, protobuf_dir=bot_protobuf_dir, max_train_time_sec=100)
 
         # Check if the bot model dir contains a model now
         self.assertTrue(os.listdir(bot_model_dir), 'bot_model_dir %s is empty after transfer learning' % bot_model_dir)

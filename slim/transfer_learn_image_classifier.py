@@ -44,7 +44,7 @@ _SYNC_REPLICAS = False
 _REPLICAS_TO_AGGREGATE = 1
 _MASTER = ''
 _MAX_NUMBER_OF_STEPS = None
-_MAX_TRAIN_TIME_SECONDS = 300  # 86400
+_MAX_TRAIN_TIME_SECONDS = 86400 # By default training is run for max. 24 hours
 _LOG_EVERY_N_STEPS = 10
 _SAVE_SUMMARRIES_SECS = 600
 _SAVE_INTERNAL_SECS = 600
@@ -216,7 +216,8 @@ def _get_variables_to_train():
 
 
 # Remove number of steps from .learn call and define own kwargs
-def _train_step_kwargs(logdir, max_train_time_seconds=_MAX_TRAIN_TIME_SECONDS, should_log=True, log_every_n_steps=_LOG_EVERY_N_STEPS,
+def _train_step_kwargs(logdir, max_train_time_seconds=_MAX_TRAIN_TIME_SECONDS, should_log=True,
+                       log_every_n_steps=_LOG_EVERY_N_STEPS,
                        should_trace=False):
     train_step_kwargs = {}
     if logdir:
@@ -270,16 +271,16 @@ def train_step(sess, train_op, global_step, train_step_kwargs):
                                                                  'run_metadata-%d' %
                                                                  np_global_step)
 
+    total_time_elapsed = (time.time() - train_step_kwargs['start_time'])
     if 'should_log' in train_step_kwargs:
         if np_global_step % train_step_kwargs['log_every_n_steps'] == 0:
-            logging.info('Global Step %d: with a loss of %.4f (%.3f sec/step)',
-                         np_global_step, total_loss, time_elapsed)
+            logging.info('global_step: %d\ttotal_time: %.3f\tloss: %.4f\tsec/step: %.3f)',
+                         np_global_step, total_time_elapsed, total_loss, time_elapsed)
 
     if 'max_train_time_sec' in train_step_kwargs and 'start_time' in train_step_kwargs:
-        time_elapsed = (time.time() - train_step_kwargs['start_time'])
-        should_stop = time_elapsed > train_step_kwargs['max_train_time_sec']
+        should_stop = total_time_elapsed > train_step_kwargs['max_train_time_sec']
         if should_stop:
-            logging.info('Stopping Training after %.3f seconds' % time_elapsed)
+            logging.info('stopping after %.3f seconds' % total_time_elapsed)
     else:
         logging.warn('Time Boundaries for training not give. Training will run until stopped')
         should_stop = False
@@ -292,21 +293,22 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
                       dataset_name='bot',
                       checkpoint_exclude_scopes=None,
                       trainable_scopes=None,
-                      max_number_of_steps=None):
+                      max_train_time_sec=None,
+                      max_number_of_steps=None,
+                      log_every_n_steps=None):
     """
-    
     :param root_model_dir: Directory containing the root models pretrained checkpoint files
     :param bot_model_dir: Directory where the transfer learned model's checkpoint files are written to
     :param protobuf_dir: Directory for the dataset factory to load the bot's training data from
     :param model_name: name of the network model for the net factory to provide the correct network and preprocesing fn
     :param dataset_split_name: 'train' or 'validation'
     :param dataset_name: triggers the dataset factory to load a bot dataset
-    :param checkpoint_exclude_scopes: 
-    :param trainable_scopes: 
-    :param max_number_of_steps: 
+    :param checkpoint_exclude_scopes: Layers to exclude when restoring the models variables
+    :param trainable_scopes: Layers to train from the restored model
+    :param max_train_time_sec: time boundary to stop training after in seconds
+    :param max_number_of_steps: maximum number of steps to run
     :return: 
     """
-
     if not max_number_of_steps:
         max_number_of_steps = _MAX_NUMBER_OF_STEPS
 
@@ -315,6 +317,12 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
 
     if not trainable_scopes:
         trainable_scopes = _TRAINABLE_SCOPES
+
+    if not max_train_time_sec:
+        max_train_time_sec = _MAX_TRAIN_TIME_SECONDS
+
+    if not log_every_n_steps:
+        log_every_n_steps = _LOG_EVERY_N_STEPS
 
     tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -493,13 +501,13 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
             train_tensor,
             logdir=bot_model_dir,
             train_step_fn=train_step,  # Manually added a custom train step to stop after max_time
-            train_step_kwargs=_train_step_kwargs(logdir=bot_model_dir),
+            train_step_kwargs=_train_step_kwargs(logdir=bot_model_dir, max_train_time_seconds=max_train_time_sec),
             master=_MASTER,
             is_chief=(_TASK == 0),
             init_fn=_get_init_fn(root_model_dir, bot_model_dir, checkpoint_exclude_scopes),
             summary_op=summary_op,
             # number_of_steps=max_number_of_steps,
-            log_every_n_steps=_LOG_EVERY_N_STEPS,
+            log_every_n_steps=log_every_n_steps,
             save_summaries_secs=_SAVE_SUMMARRIES_SECS,
             save_interval_secs=_SAVE_INTERNAL_SECS,
             sync_optimizer=optimizer if _SYNC_REPLICAS else None)
@@ -508,6 +516,7 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
 def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inception_v3',
           dataset_split_name='train',
           dataset_name='bot',
+          max_train_time_sec=None,
           max_number_of_steps=None):
     """
 
@@ -528,6 +537,7 @@ def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inceptio
                       dataset_name=dataset_name,
                       checkpoint_exclude_scopes=None,
                       trainable_scopes=None,
+                      max_train_time_sec=max_train_time_sec,
                       max_number_of_steps=max_number_of_steps)
 
 
