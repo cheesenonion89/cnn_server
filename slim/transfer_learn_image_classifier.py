@@ -526,6 +526,7 @@ def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inceptio
         :param model_name: network model for the net factory to provide the correct network and preprocesing fn
         :param dataset_split_name: 'train' or 'validation'
         :param dataset_name: triggers the dataset factory to load a bot dataset
+        :param max_train_time_sec:
         :param max_number_of_steps: 
         :return: 
     """
