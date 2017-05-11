@@ -1,5 +1,12 @@
+import time
+
+import os
 import tensorflow as tf
+from tensorflow.core.protobuf import config_pb2
+from tensorflow.python.client import timeline
+from tensorflow.python.lib.io import file_io
 from tensorflow.python.ops import control_flow_ops
+from tensorflow.python.platform import tf_logging as logging
 
 from slim.datasets import dataset_factory
 from slim.deployment import model_deploy
@@ -37,6 +44,7 @@ _SYNC_REPLICAS = False
 _REPLICAS_TO_AGGREGATE = 1
 _MASTER = ''
 _MAX_NUMBER_OF_STEPS = None
+_MAX_TRAIN_TIME_SECONDS = 300  # 86400
 _LOG_EVERY_N_STEPS = 10
 _SAVE_SUMMARRIES_SECS = 600
 _SAVE_INTERNAL_SECS = 600
@@ -205,6 +213,78 @@ def _get_variables_to_train():
         variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope)
         variables_to_train.extend(variables)
     return variables_to_train
+
+
+# Remove number of steps from .learn call and define own kwargs
+def _train_step_kwargs(logdir, max_train_time_seconds=_MAX_TRAIN_TIME_SECONDS, should_log=True, log_every_n_steps=_LOG_EVERY_N_STEPS,
+                       should_trace=False):
+    train_step_kwargs = {}
+    if logdir:
+        train_step_kwargs['logdir'] = logdir
+
+    if should_log:
+        train_step_kwargs['should_log'] = should_log
+    if should_trace:
+        train_step_kwargs['should_trace'] = should_trace
+
+    if log_every_n_steps:
+        train_step_kwargs['log_every_n_steps'] = log_every_n_steps
+
+    start_time = time.time()
+
+    train_step_kwargs['start_time'] = start_time
+    train_step_kwargs['max_train_time_sec'] = max_train_time_seconds
+
+    return train_step_kwargs
+
+
+# Add a train_step_fn to use instead of default
+def train_step(sess, train_op, global_step, train_step_kwargs):
+    start_time = time.time()
+
+    trace_run_options = None
+    run_metadata = None
+    if 'should_trace' in train_step_kwargs:
+        if 'logdir' not in train_step_kwargs:
+            raise ValueError('logdir must be present in train_step_kwargs when '
+                             'should_trace is present')
+        if sess.run(train_step_kwargs['should_trace']):
+            trace_run_options = config_pb2.RunOptions(
+                trace_level=config_pb2.RunOptions.FULL_TRACE)
+            run_metadata = config_pb2.RunMetadata()
+
+    total_loss, np_global_step = sess.run([train_op, global_step],
+                                          options=trace_run_options,
+                                          run_metadata=run_metadata)
+    time_elapsed = time.time() - start_time
+
+    if run_metadata is not None:
+        tl = timeline.Timeline(run_metadata.step_stats)
+        trace = tl.generate_chrome_trace_format()
+        trace_filename = os.path.join(train_step_kwargs['logdir'],
+                                      'tf_trace-%d.json' % np_global_step)
+        logging.info('Writing trace to %s', trace_filename)
+        file_io.write_string_to_file(trace_filename, trace)
+        if 'summary_writer' in train_step_kwargs:
+            train_step_kwargs['summary_writer'].add_run_metadata(run_metadata,
+                                                                 'run_metadata-%d' %
+                                                                 np_global_step)
+
+    if 'should_log' in train_step_kwargs:
+        if np_global_step % train_step_kwargs['log_every_n_steps'] == 0:
+            logging.info('Global Step %d: with a loss of %.4f (%.3f sec/step)',
+                         np_global_step, total_loss, time_elapsed)
+
+    if 'max_train_time_sec' in train_step_kwargs and 'start_time' in train_step_kwargs:
+        time_elapsed = (time.time() - train_step_kwargs['start_time'])
+        should_stop = time_elapsed > train_step_kwargs['max_train_time_sec']
+        if should_stop:
+            logging.info('Stopping Training after %.3f seconds' % time_elapsed)
+    else:
+        logging.warn('Time Boundaries for training not give. Training will run until stopped')
+        should_stop = False
+
+    return total_loss, should_stop
 
 
 def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='inception_v3',
@@ -412,11 +492,13 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
         slim.learning.train(
             train_tensor,
             logdir=bot_model_dir,
+            train_step_fn=train_step,  # Manually added a custom train step to stop after max_time
+            train_step_kwargs=_train_step_kwargs(logdir=bot_model_dir),
             master=_MASTER,
             is_chief=(_TASK == 0),
             init_fn=_get_init_fn(root_model_dir, bot_model_dir, checkpoint_exclude_scopes),
             summary_op=summary_op,
-            number_of_steps=max_number_of_steps,
+            # number_of_steps=max_number_of_steps,
             log_every_n_steps=_LOG_EVERY_N_STEPS,
             save_summaries_secs=_SAVE_SUMMARRIES_SECS,
             save_interval_secs=_SAVE_INTERNAL_SECS,
