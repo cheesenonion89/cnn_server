@@ -1,8 +1,8 @@
-
-from cnn_server.classification.Classifier import Classifier
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
+
+from cnn_server.classification.Classifier import Classifier
 from cnn_server.server.Server import Server
 from cnn_server.training_data.TrainingData import TrainingData
 from cnn_server.transfer_learning.TransferLearning import TransferLearning

@@ -15,3 +15,5 @@ __pycache__/*
 *.pyc
 .idea
 __pycache__/
+/cnn_server/test/files/flower_protobuf/
+/cnn_server/test/files/protobuf/
