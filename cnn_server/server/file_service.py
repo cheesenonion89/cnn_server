@@ -113,5 +113,16 @@ def get_transfer_learning_file(dataset_name):
     return _create_if_not_exists(dataset_file_path)
 
 
+def get_transfer_learning_sample_file(sample_name):
+    transfer_datasets = {
+        'car_types': 'transfer_dataset_car_types_conf70_sample.csv',
+        'seasons': 'transfer_dataset_seasons_conf70_sample.csv'
+    }
+    dataset_file = transfer_datasets[sample_name]
+    dataset_file_path = os.path.join(DATASET_TRANSFER_DIR, dataset_file)
+    return dataset_file_path
+    # return _create_if_not_exists(dataset_file_path)
+
+
 def get_test_training_file():
     return os.path.join(DATASET_TEST_DIR, 'test_dataset_cars_train.csv')
