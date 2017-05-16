@@ -34,61 +34,61 @@ _FILE_PATTERN = 'sample_%s_*.tfrecord'
 SPLITS_TO_SIZES = {'train': 3320, 'validation': 350}
 
 _ITEMS_TO_DESCRIPTIONS = {
-	'image': 'A color image of varying size.',
-	'label': 'A single integer between 0 and nr of classes'
+    'image': 'A color image of varying size.',
+    'label': 'A single integer between 0 and nr of classes'
 }
 
 
 def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
-	"""
-	
-	:param split_name: 
-	:param dataset_dir: 
-	:param file_pattern: 
-	:param reader: 
-	:return: 
-	"""
+    """
+    
+    :param split_name: 
+    :param dataset_dir: 
+    :param file_pattern: 
+    :param reader: 
+    :return: 
+    """
 
-	num_classes = dataset_utils.get_number_of_classes_by_labels(dataset_dir)
+    num_classes = dataset_utils.get_number_of_classes_by_labels(dataset_dir)
 
-	if not num_classes:
-		raise FileNotFoundError('Dataset in %s not Found' % dataset_dir)
+    if not num_classes:
+        raise FileNotFoundError('Dataset in %s not Found' % dataset_dir)
 
-	if split_name not in SPLITS_TO_SIZES:
-		raise ValueError('split name %s was not recognized.' % split_name)
+    if split_name not in SPLITS_TO_SIZES:
+        raise ValueError('split name %s was not recognized.' % split_name)
 
-	if not file_pattern:
-		file_pattern = _FILE_PATTERN
-	file_pattern = os.path.join(dataset_dir, file_pattern % split_name)
+    if not file_pattern:
+        file_pattern = _FILE_PATTERN
+    file_pattern = os.path.join(dataset_dir, file_pattern % split_name)
 
-	# Allowing None in the signature so that dataset_factory can use the default.
-	if reader is None:
-		reader = tf.TFRecordReader
+    # Allowing None in the signature so that dataset_factory can use the default.
+    if reader is None:
+        reader = tf.TFRecordReader
 
-	keys_to_features = {
-		'image/encoded': tf.FixedLenFeature((), tf.string, default_value=''),
-		'image/format': tf.FixedLenFeature((), tf.string, default_value='png'),
-		'image/class/label': tf.FixedLenFeature(
-			[], tf.int64, default_value=tf.zeros([], dtype=tf.int64)),
-	}
+    keys_to_features = {
+        'image/encoded': tf.FixedLenFeature((), tf.string, default_value=''),
+        'image/format': tf.FixedLenFeature((), tf.string, default_value='png'),
+        'image/class/label': tf.FixedLenFeature(
+            [], tf.int64, default_value=tf.zeros([], dtype=tf.int64)),
+    }
 
-	items_to_handlers = {
-		'image': slim.tfexample_decoder.Image(),
-		'label': slim.tfexample_decoder.Tensor('image/class/label'),
-	}
+    items_to_handlers = {
+        'image': slim.tfexample_decoder.Image(),
+        'label': slim.tfexample_decoder.Tensor('image/class/label'),
+    }
 
-	decoder = slim.tfexample_decoder.TFExampleDecoder(
-		keys_to_features, items_to_handlers)
+    decoder = slim.tfexample_decoder.TFExampleDecoder(
+        keys_to_features, items_to_handlers)
 
-	labels_to_names = None
-	if dataset_utils.has_labels(dataset_dir):
-		labels_to_names = dataset_utils.read_label_file(dataset_dir)
+    labels_to_names = None
+    if dataset_utils.has_labels(dataset_dir):
+        labels_to_names = dataset_utils.read_label_file(dataset_dir)
 
-	return slim.dataset.Dataset(
-		data_sources=file_pattern,
-		reader=reader,
-		decoder=decoder,
-		num_samples=SPLITS_TO_SIZES[split_name],
-		items_to_descriptions=_ITEMS_TO_DESCRIPTIONS,
-		num_classes=num_classes,
-		labels_to_names=labels_to_names)
+    return slim.dataset.Dataset(
+        data_sources=file_pattern,
+        reader=reader,
+        decoder=decoder,
+        num_samples=SPLITS_TO_SIZES[split_name],
+        items_to_descriptions=_ITEMS_TO_DESCRIPTIONS,
+        num_classes=num_classes,
+        labels_to_names=labels_to_names)

@@ -6,7 +6,7 @@ import os
 import slim.train_root_models as trainer
 from cnn_server.server import file_service as dirs
 
-
+"""
 class TestTrainRootModels(TestCase):
     def test_train_root_model(self):
         root_model_protobufs = dirs.get_protobuf_dir('root')
@@ -49,3 +49,4 @@ class TestTrainRootModels(TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+"""

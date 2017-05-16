@@ -24,6 +24,20 @@ class TestServer(TestCase):
         ckpt_path_none = dirs.get_root_model_ckpt_path(train.networks_map[model_not_pretrained])
         self.assertFalse(ckpt_path_none)
 
+    def test_get_datasets(self):
+        train_dataset = dirs.get_root_model_training_file()
+        self.assertTrue(os.path.isfile(train_dataset))
+
+        bmw_model_file = dirs.get_transfer_learning_file('bmw_model')
+        car_types_file = dirs.get_transfer_learning_file('car_types')
+        cars_file = dirs.get_transfer_learning_file('cars')
+        seasons_file = dirs.get_transfer_learning_file('seasons')
+
+        self.assertTrue(os.path.isfile(bmw_model_file))
+        self.assertTrue(os.path.isfile(car_types_file))
+        self.assertTrue(os.path.isfile(cars_file))
+        self.assertTrue(os.path.isfile(seasons_file))
+
 
 if __name__ == '__main__':
     unittest.main()
