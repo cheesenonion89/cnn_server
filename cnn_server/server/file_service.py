@@ -43,7 +43,7 @@ def get_root_model_dir(model_name=None):
     if not os.path.exists(root_model_dir):
         os.makedirs(root_model_dir)
     if not model_name:
-        return root_model_dir
+        return os.path.join(root_model_dir, 'inception_v3')
     else:
         if not model_name in root_model_map:
             print('model_name %s is not defined as root model' % model_name)
@@ -53,6 +53,16 @@ def get_root_model_dir(model_name=None):
             print("Creating root model directory for model %s" % model_name)
             os.makedirs(root_model_dir)
         return root_model_dir
+
+
+def get_root_model_ckpt_path(model_name):
+    root_model_ckpts = os.path.join(PROJECT_ROOT_DIR, 'root_model_checkpoints')
+    root_model_ckpt_path = os.path.join(root_model_ckpts, model_name)
+    if not os.path.exists(root_model_ckpt_path):
+        print('There is no checkpoint for model %s' % model_name)
+        return None
+    else:
+        return root_model_ckpt_path
 
 
 def get_test_root_model_dir():

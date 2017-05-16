@@ -17,12 +17,25 @@ networks_map = {
     'resnet_v2_152_pretrained': 'resnet_v2_152'
 }
 
-for model in dirs.root_model_map:
-    root_model_path = dirs.get_root_model_dir(model_name=model)
-    network_name = networks_map[model]
+
+def train_root_model(root_model, max_train_time=None):
+    root_model_path = dirs.get_root_model_dir(model_name=root_model)
+    network_name = networks_map[root_model]
+    root_model_ckpt_path = None
+    if root_model.endswith('_pretrained'):
+        root_model_ckpt_path = dirs.get_root_model_ckpt_path(network_name)
+        if not root_model_ckpt_path:
+            pass
+
     tl.train(
         bot_model_dir=root_model_path,
         protobuf_dir=_TRAINING_DATA_ROOT_FOLDER,
+        root_model_dir=root_model_ckpt_path,
         model_name=network_name,
-        max_train_time_sec=300
+        max_train_time_sec=max_train_time
     )
+
+
+def train_root_models(max_train_time_per_model=None):
+    for root_model in dirs.root_model_map:
+        train_root_model(root_model, max_train_time=max_train_time_per_model)
