@@ -94,6 +94,7 @@ def download_training_data(bot_id, from_csv, resume_from=None):
     print('Downloaded %s thumbnails and %s images. %s images were not available.' % (thumbnail_ctr, image_ctr, na_ctr))
 
 
+"""
 if __name__ == '__main__':
     args = [None, None, None]
     for idx, arg in enumerate(sys.argv):
@@ -107,3 +108,4 @@ if __name__ == '__main__':
     else:
         print('Downloading cars dataset for initial training')
         download_training_data('root', dirs.get_root_model_training_file(), resume_from)
+"""

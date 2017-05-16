@@ -5,7 +5,7 @@ TRAINING_DATA_DIR = os.path.join(PROJECT_ROOT_DIR, 'training_data')
 PROTOBUF_DIR = os.path.join(PROJECT_ROOT_DIR, 'protobuf')
 MODEL_DIR = os.path.join(PROJECT_ROOT_DIR, 'model')
 DATASET_DIR = os.path.join(PROJECT_ROOT_DIR, 'datasets')
-DATASET_TRAIN_DIR = os.path.join(DATASET_DIR, 'train')
+DATASET_TRAIN_DIR = os.path.join(DATASET_DIR, 'training')
 DATASET_TEST_DIR = os.path.join(DATASET_DIR, 'test')
 DATASET_TRANSFER_DIR = os.path.join(DATASET_DIR, 'transfer learning')
 
@@ -92,15 +92,15 @@ def get_dataset_transfer_dir():
 
 
 def get_root_model_training_file():
-    return _create_if_not_exists(os.path.join(DATASET_TRAIN_DIR, 'initial_training_dataset_cars_conf70.csv'))
+    return os.path.join(DATASET_TRAIN_DIR, 'initial_training_dataset_cars_conf70.csv')
 
 
 def get_transfer_learning_file(dataset_name):
     transfer_datasets = {
         'bmw_models': 'transfer_dataset_bmw_models_conf70.csv',
-        'car_types': 'transfer_dataset_car_types_conf70.csv',
+        'car_types': 'transfer_dataset_car_types_conf70_sample.csv',
         'cars': 'transfer_dataset_cars_conf70.csv',
-        'seasons': 'transfer_dataset_seasons_conf70.csv'
+        'seasons': 'transfer_dataset_seasons_conf70_sample.csv'
     }
     dataset_file = transfer_datasets[dataset_name]
     if not dataset_file:
@@ -110,7 +110,7 @@ def get_transfer_learning_file(dataset_name):
     if not os.path.isfile(dataset_file_path):
         print('the dataset file %s does not exist' % dataset_file_path)
         return None
-    return _create_if_not_exists(dataset_file_path)
+    return dataset_file_path
 
 
 def get_transfer_learning_sample_file(sample_name):
