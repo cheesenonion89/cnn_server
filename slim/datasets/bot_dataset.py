@@ -33,6 +33,9 @@ _FILE_PATTERN = 'sample_%s_*.tfrecord'
 
 SPLITS_TO_SIZES = {'train': 3320, 'validation': 350}
 
+# TODO: Replace SPLITS_TO_SIZES BY A MAP {dataset_name:{train:90%, validation:10%}}
+
+
 _ITEMS_TO_DESCRIPTIONS = {
     'image': 'A color image of varying size.',
     'label': 'A single integer between 0 and nr of classes'
