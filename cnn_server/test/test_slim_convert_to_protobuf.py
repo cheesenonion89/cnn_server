@@ -72,6 +72,50 @@ class TestConvertToProtobuf(TestCase):
             shutil.rmtree(protobuf_dir)
             os.mkdir(protobuf_dir)
 
+    def test_run(self):
+        protobuf_dir = dirs.get_protobuf_dir(BOT_ID)
+        training_data_dir = dirs.get_training_data_dir(BOT_ID)
+        if not os.listdir(training_data_dir):
+            print("Cannot start test. No data in %s" & training_data_dir)
+            return
+        if not os.path.exists(protobuf_dir):
+            os.mkdir(protobuf_dir)
+        if os.listdir(protobuf_dir):
+            shutil.rmtree(protobuf_dir)
+            os.mkdir(protobuf_dir)
+
+        converter.run(training_data_dir, protobuf_dir, 0.1)
+
+        # Check if the labels.txt has been created
+        self.assertTrue(os.path.isfile(os.path.join(protobuf_dir, 'labels.txt')))
+
+        # Make sure the labels file contains as mainy files as the training data folder has subfolders
+        with open(os.path.join(protobuf_dir, 'labels.txt')) as f:
+            for lndx, dir in enumerate(os.listdir(training_data_dir)):
+                pass
+            for fndx, ln in enumerate(f):
+                pass
+            self.assertEqual(lndx, fndx)
+
+        # Make sure there are 10
+        protofiles = 0
+        training_files = 0
+        validation_files = 0
+        for file in os.listdir(protobuf_dir):
+            if file.endswith('.tfrecord'):
+                protofiles += 1
+            if 'train' in file:
+                training_files += 1
+            if 'validation' in file:
+                validation_files += 1
+        self.assertEqual(10, protofiles)
+        self.assertEqual(5, training_files)
+        self.assertEqual(5, validation_files)
+
+        if os.listdir(protobuf_dir):
+            shutil.rmtree(protobuf_dir)
+            os.mkdir(protobuf_dir)
+
 
 if __name__ == '__main__':
     unittest.main()

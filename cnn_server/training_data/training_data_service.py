@@ -4,7 +4,7 @@ from zipfile import ZipFile
 import os
 
 import cnn_server.server.file_service as dirs
-from slim.datasets import convert_training_data
+from slim.datasets import convert_to_protobuf as converter
 
 
 def validate_training_data(file):
@@ -98,6 +98,6 @@ def write_to_protobuffer(bot_id: int):
     if not os.path.exists(bot_protobuf_dir):
         os.mkdir(bot_protobuf_dir)
 
-    convert_training_data.run(bot_training_data_dir, bot_protobuf_dir)
+    converter.run(bot_training_data_dir, bot_protobuf_dir)
 
     return True

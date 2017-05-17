@@ -1,6 +1,11 @@
+import math
+import sys
+
 import os
-import tensorflow as tf
 import random
+import tensorflow as tf
+
+from slim.datasets import dataset_utils
 
 _FRACT_VALIDATION = 0.1
 _NUM_SHARDS = 5
@@ -68,15 +73,60 @@ def _get_filenames_and_classes(training_data_dir, fract_validation):
     return training_files, validation_files, class_names
 
 
-def run(training_data_dir, protobuf_dir, fract_validation=_FRACT_VALIDATION, num_shards=_NUM_SHARDS):
+def _convert_dataset(split_name, filenames, class_names_to_ids, protobuf_dir, num_shards):
     """
 
-        :param training_data_dir: 
-        :param protobuf_dir: 
-        :param num_validation: 
-        :param num_shards: 
-        :return: 
-        """
+    :param split_name: 
+    :param filenames: 
+    :param class_names_to_ids: 
+    :param protobuf_dir: 
+    :return: 
+    """
+    assert split_name in ['train', 'validation']
+
+    num_per_shard = int(math.ceil(len(filenames) / float(num_shards)))
+
+    with tf.Graph().as_default():
+        image_reader = ImageReader()
+
+        with tf.Session('') as sess:
+
+            for shard_id in range(num_shards):
+                output_filename = _get_dataset_filename(
+                    protobuf_dir, split_name, shard_id, num_shards)
+
+                with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
+                    start_ndx = shard_id * num_per_shard
+                    end_ndx = min((shard_id + 1) * num_per_shard, len(filenames))
+                    for i in range(start_ndx, end_ndx):
+                        sys.stdout.write('\r>> Converting image %d/%d shard %d' % (
+                            i + 1, len(filenames), shard_id))
+                        sys.stdout.flush()
+
+                        # Read the filename:
+                        image_data = tf.gfile.FastGFile(filenames[i], 'r').read()
+                        height, width = image_reader.read_image_dims(sess, image_data)
+
+                        class_name = os.path.basename(os.path.dirname(filenames[i]))
+                        class_id = class_names_to_ids[class_name]
+
+                        example = dataset_utils.image_to_tfexample(
+                            image_data, b'jpg', height, width, class_id)
+                        tfrecord_writer.write(example.SerializeToString())
+
+    sys.stdout.write('\n')
+    sys.stdout.flush()
+
+
+def run(training_data_dir, protobuf_dir, fract_validation=_FRACT_VALIDATION, num_shards=_NUM_SHARDS):
+    """
+    
+    :param training_data_dir: 
+    :param protobuf_dir: 
+    :param fract_validation: 
+    :param num_shards: 
+    :return: 
+    """
     if not tf.gfile.Exists(protobuf_dir):
         tf.gfile.MakeDirs(protobuf_dir)
 
@@ -86,9 +136,18 @@ def run(training_data_dir, protobuf_dir, fract_validation=_FRACT_VALIDATION, num
 
     training_filenames, validation_filenames, class_names = _get_filenames_and_classes(training_data_dir,
                                                                                        fract_validation)
+    class_names_to_ids = dict(zip(class_names, range(len(class_names))))
 
     random.seed(_RANDOM_SEED)
     random.shuffle(training_filenames)
     random.shuffle(validation_filenames)
 
+    _convert_dataset('train', training_filenames, class_names_to_ids, protobuf_dir, num_shards)
+    _convert_dataset('validation', validation_filenames, class_names_to_ids, protobuf_dir, num_shards)
 
+    # Finally, write the labels file:
+    labels_to_class_names = dict(zip(range(len(class_names)), class_names))
+    dataset_utils.write_label_file(labels_to_class_names, protobuf_dir)
+
+    # _clean_up_temporary_files(dataset_dir)
+    print('\nFinished converting the dataset!')
