@@ -67,7 +67,7 @@ class ImageReader(object):
 
 def _get_filenames_and_classes(training_data_dir):
     """
-    
+
     :param training_data_dir: 
     :return: 
     """
@@ -89,15 +89,15 @@ def _get_filenames_and_classes(training_data_dir):
     return photo_filenames, sorted(class_names)
 
 
-def _get_dataset_filename(protobuf_dir, split_name, shard_id):
+def _get_dataset_filename(protobuf_dir, split_name, shard_id, num_shards):
     output_filename = 'sample_%s_%05d-of-%05d.tfrecord' % (
-        split_name, shard_id, _NUM_SHARDS)
+        split_name, shard_id, num_shards)
     return os.path.join(protobuf_dir, output_filename)
 
 
-def _convert_dataset(split_name, filenames, class_names_to_ids, protobuf_dir):
+def _convert_dataset(split_name, filenames, class_names_to_ids, protobuf_dir, num_shards):
     """
-    
+
     :param split_name: 
     :param filenames: 
     :param class_names_to_ids: 
@@ -106,16 +106,16 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, protobuf_dir):
     """
     assert split_name in ['train', 'validation']
 
-    num_per_shard = int(math.ceil(len(filenames) / float(_NUM_SHARDS)))
+    num_per_shard = int(math.ceil(len(filenames) / float(num_shards)))
 
     with tf.Graph().as_default():
         image_reader = ImageReader()
 
         with tf.Session('') as sess:
 
-            for shard_id in range(_NUM_SHARDS):
+            for shard_id in range(num_shards):
                 output_filename = _get_dataset_filename(
-                    protobuf_dir, split_name, shard_id)
+                    protobuf_dir, split_name, shard_id, num_shards)
 
                 with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
                     start_ndx = shard_id * num_per_shard
@@ -140,27 +140,29 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, protobuf_dir):
     sys.stdout.flush()
 
 
-def _dataset_exists(dataset_dir):
+def _dataset_exists(dataset_dir, num_shards):
     for split_name in ['train', 'validation']:
-        for shard_id in range(_NUM_SHARDS):
+        for shard_id in range(num_shards):
             output_filename = _get_dataset_filename(
-                dataset_dir, split_name, shard_id)
+                dataset_dir, split_name, shard_id, num_shards)
             if not tf.gfile.Exists(output_filename):
                 return False
     return True
 
 
-def run(training_data_dir, protobuf_dir):
+def run(training_data_dir, protobuf_dir, num_validation=_NUM_VALIDATION, num_shards=_NUM_SHARDS):
     """
     
     :param training_data_dir: 
     :param protobuf_dir: 
+    :param num_validation: 
+    :param num_shards: 
     :return: 
     """
     if not tf.gfile.Exists(protobuf_dir):
         tf.gfile.MakeDirs(protobuf_dir)
 
-    if _dataset_exists(protobuf_dir):
+    if _dataset_exists(protobuf_dir, num_shards):
         print('Dataset files already exist. Exiting without re-creating them.')
         return
 
@@ -170,12 +172,12 @@ def run(training_data_dir, protobuf_dir):
     # Divide into train and test:
     random.seed(_RANDOM_SEED)
     random.shuffle(photo_filenames)
-    training_filenames = photo_filenames[_NUM_VALIDATION:]
-    validation_filenames = photo_filenames[:_NUM_VALIDATION]
+    training_filenames = photo_filenames[num_validation:]
+    validation_filenames = photo_filenames[:num_validation]
 
     # First, convert the training and validation sets.
-    _convert_dataset('train', training_filenames, class_names_to_ids, protobuf_dir)
-    _convert_dataset('validation', validation_filenames, class_names_to_ids, protobuf_dir)
+    _convert_dataset('train', training_filenames, class_names_to_ids, protobuf_dir, num_shards)
+    _convert_dataset('validation', validation_filenames, class_names_to_ids, protobuf_dir, num_shards)
 
     # Finally, write the labels file:
     labels_to_class_names = dict(zip(range(len(class_names)), class_names))

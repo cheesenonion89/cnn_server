@@ -15,26 +15,26 @@ BOT_PROTOBUF_DIR = dirs.get_protobuf_dir(BOT_ID)
 
 
 class TestTrainingDataReceiveHandler(TestCase):
-	def test_handle_put(self):
-		if os.path.exists(BOT_PROTOBUF_DIR):
-			shutil.rmtree(BOT_PROTOBUF_DIR)
+    def test_handle_put(self):
+        if os.path.exists(BOT_PROTOBUF_DIR):
+            shutil.rmtree(BOT_PROTOBUF_DIR)
 
-		if os.path.exists(BOT_TRAINING_DATA_DIR):
-			shutil.rmtree(BOT_TRAINING_DATA_DIR)
+        if os.path.exists(BOT_TRAINING_DATA_DIR):
+            shutil.rmtree(BOT_TRAINING_DATA_DIR)
 
-		vld_result, vld_status = handler.handle_put(BOT_ID, os.path.join(FILES_DIR, 'valid_trainingdata.zip'))
-		self.assertEqual("Training Data created", vld_result)
-		self.assertEqual(200, vld_status)
+        vld_result, vld_status = handler.handle_put(BOT_ID, os.path.join(FILES_DIR, 'valid_trainingdata.zip'))
+        self.assertEqual("Training Data created", vld_result)
+        self.assertEqual(200, vld_status)
 
-		self.assertEqual("Training Data is invalid",
-						 handler.handle_put(BOT_ID, os.path.join(FILES_DIR, 'invalid_training_data_subfolder.zip'))[0])
+        self.assertEqual("Training Data is invalid",
+                         handler.handle_put(BOT_ID, os.path.join(FILES_DIR, 'invalid_training_data_subfolder.zip'))[0])
 
-		if os.path.exists(BOT_PROTOBUF_DIR):
-			shutil.rmtree(BOT_PROTOBUF_DIR)
+        if os.path.exists(BOT_PROTOBUF_DIR):
+            shutil.rmtree(BOT_PROTOBUF_DIR)
 
-		if os.path.exists(BOT_TRAINING_DATA_DIR):
-			shutil.rmtree(BOT_TRAINING_DATA_DIR)
+        if os.path.exists(BOT_TRAINING_DATA_DIR):
+            shutil.rmtree(BOT_TRAINING_DATA_DIR)
 
 
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

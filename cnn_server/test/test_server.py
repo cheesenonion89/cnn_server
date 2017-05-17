@@ -28,7 +28,7 @@ class TestServer(TestCase):
         train_dataset = dirs.get_root_model_training_file()
         self.assertTrue(os.path.isfile(train_dataset))
 
-        bmw_model_file = dirs.get_transfer_learning_file('bmw_model')
+        bmw_model_file = dirs.get_transfer_learning_file('bmw_models')
         car_types_file = dirs.get_transfer_learning_file('car_types')
         cars_file = dirs.get_transfer_learning_file('cars')
         seasons_file = dirs.get_transfer_learning_file('seasons')
