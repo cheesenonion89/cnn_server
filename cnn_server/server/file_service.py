@@ -126,3 +126,7 @@ def get_transfer_learning_sample_file(sample_name):
 
 def get_test_training_file():
     return os.path.join(DATASET_TEST_DIR, 'test_dataset_cars_train.csv')
+
+
+def get_bot_id_from_dir(dir_name: str):
+    return dir_name.split('/')[-2].replace('bot_', '')

@@ -101,3 +101,7 @@ def write_to_protobuffer(bot_id: int):
     converter.run(bot_training_data_dir, bot_protobuf_dir)
 
     return True
+
+
+
+

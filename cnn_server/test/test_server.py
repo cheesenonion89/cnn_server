@@ -38,6 +38,19 @@ class TestServer(TestCase):
         self.assertTrue(os.path.isfile(cars_file))
         self.assertTrue(os.path.isfile(seasons_file))
 
+    def test_get_bot_id_from_dir(self):
+        bmw_models_bot_id = 'bmw_models'
+        training_data_dir = dirs.get_training_data_dir(bmw_models_bot_id)
+        protobuf_dir = dirs.get_protobuf_dir(bmw_models_bot_id)
+        model_dir = dirs.get_model_data_dir(bmw_models_bot_id)
+        bot_id = dirs.get_bot_id_from_dir(training_data_dir)
+        self.assertEqual(bmw_models_bot_id, bot_id, 'bot ids do not match')
+        bot_id = dirs.get_bot_id_from_dir(protobuf_dir)
+        self.assertEqual(bmw_models_bot_id, bot_id, 'bot ids do not match')
+        bot_id = dirs.get_bot_id_from_dir(model_dir)
+        self.assertEqual(bmw_models_bot_id, bot_id, 'bot ids do not match')
+
+
 
 if __name__ == '__main__':
     unittest.main()
