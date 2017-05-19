@@ -31,44 +31,72 @@ _NUM_PREPROCESSING_THREADS = 4
 # Loss Function
 _LABEL_SMOOTHING = 0.0
 
-# Learning Rate
-_MOVING_AVERAGE_DECAY = None
-_NUM_EPOCHS_PER_DECAY = 2.0
-_LEARNING_RATE_DECAY_TYPE = 'exponential'
-_LEARNING_RATE = 0.01
-_LEARNING_RATE_DECAY_FACTOR = 0.94
-_END_LEARNING_RATE = 0.0001
-
 # Training
 _SYNC_REPLICAS = False
 _REPLICAS_TO_AGGREGATE = 1
 _MASTER = ''
 _MAX_NUMBER_OF_STEPS = None
-_MAX_TRAIN_TIME_SECONDS = 86400 # By default training is run for max. 24 hours
-_LOG_EVERY_N_STEPS = 10
-_SAVE_SUMMARRIES_SECS = 600
-_SAVE_INTERNAL_SECS = 600
+_MAX_TRAIN_TIME_SECONDS = 86400  # By default training is run for max. 24 hours
+_LOG_EVERY_N_STEPS = 2
+_SAVE_SUMMARRIES_SECS = 60
+_SAVE_INTERNAL_SECS = 60
 
-### OPTIMIZATION PARAMETERS
-_LABELS_OFFSET = 0
-_WEIGHT_DECAY = 0.00004
-_ADADELTA_RHO = 0.95
+# OPTIMIZER
 _OPTIMIZER = 'rmsprop'
 _OPT_EPSILON = 1.0
+
+_ADADELTA_RHO = 0.95
+
 _ADAGRAD_INITIAL_ACCUMULATOR_VALUE = 0.1
+
 _ADAM_BETA1 = 0.9
 _ADAM_BETA2 = 0.999
-_MOMENTUM = 0.9
+
 _RMSPROP_DECAY = 0.9
-_FTRL_LEARNING_RATE_POWER = -0.5
+
+_FTRL_LEARNING_RATE_POWER = 0.01
+_POWER = -0.5
 _FTRL_INITIAL_ACCUMULATOR_VALUE = 0.1
 _FTRL_L1 = 0.0
 _FTRL_L2 = 0.0
+
+# NETWORK FUNCTION
+_LABELS_OFFSET = 0
 
 # TRANSFER_LEARNING
 _TRAINABLE_SCOPES = None
 _CHECKPOINT_EXCLUDE_SCOPES = None
 _IGNORE_MISSING_VARS = False
+
+# ERROR FUNCTION / OPTIMIIZATION PARAMETERS
+
+_MOVING_AVERAGE_DECAY = None  # Smoothing fator
+_NUM_EPOCHS_PER_DECAY = 2.0
+
+_LEARNING_RATE = 0.01
+_LEARNING_RATE_DECAY_FACTOR = 0.94
+_END_LEARNING_RATE = 0.0001
+_LEARNING_RATE_DECAY_TYPE = 'exponential'
+
+_MOMENTUM = 0.9  # 'Soften' the steepness of the gradient
+_WEIGHT_DECAY = 0.00004  # Regularization of the weights, penalizes large weights, avoid overfitting
+
+_DROPOUT_KEEP_PROB = None
+
+OPTIMIZATION_PARAMS = {
+    'moving_average_decay': _MOVING_AVERAGE_DECAY,
+    'num_epochs_per_decay': _NUM_EPOCHS_PER_DECAY,
+
+    'learning_rate': _LEARNING_RATE,
+    'learning_rate_decay_factor': _LEARNING_RATE_DECAY_FACTOR,
+    'end_learning_rate': _END_LEARNING_RATE,
+    'learning_rate_decay_type': _LEARNING_RATE_DECAY_TYPE,
+
+    'momentum': _MOMENTUM,
+    'weight_decay': _WEIGHT_DECAY,
+
+    'dropout_keep_prob': _DROPOUT_KEEP_PROB
+}
 
 
 def _configure_learning_rate(num_samples_per_epoch, global_step):
@@ -79,30 +107,30 @@ def _configure_learning_rate(num_samples_per_epoch, global_step):
     :return: 
     """
     decay_steps = int(num_samples_per_epoch / _BATCH_SIZE *
-                      _NUM_EPOCHS_PER_DECAY)
+                      OPTIMIZATION_PARAMS['num_epochs_per_decay'])
     if _SYNC_REPLICAS:
         decay_steps /= _REPLICAS_TO_AGGREGATE
 
-    if _LEARNING_RATE_DECAY_TYPE == 'exponential':
-        return tf.train.exponential_decay(_LEARNING_RATE,
+    if OPTIMIZATION_PARAMS['learning_rate_decay_type'] == 'exponential':
+        return tf.train.exponential_decay(OPTIMIZATION_PARAMS['learning_rate'],
                                           global_step,
                                           decay_steps,
-                                          _LEARNING_RATE_DECAY_FACTOR,
+                                          OPTIMIZATION_PARAMS['learning_rate_decay_factor'],
                                           staircase=True,
                                           name='exponential_decay_learning_rate')
-    elif _LEARNING_RATE_DECAY_TYPE == 'fixed':
-        return tf.constant(_LEARNING_RATE, name='fixed_learning_rate')
-    elif _LEARNING_RATE_DECAY_TYPE == 'polynomial':
-        return tf.train.polynomial_decay(_LEARNING_RATE,
+    elif OPTIMIZATION_PARAMS['learning_rate_decay_type'] == 'fixed':
+        return tf.constant(OPTIMIZATION_PARAMS['learning_rate'], name='fixed_learning_rate')
+    elif OPTIMIZATION_PARAMS['learning_rate_decay_type'] == 'polynomial':
+        return tf.train.polynomial_decay(OPTIMIZATION_PARAMS['learning_rate'],
                                          global_step,
                                          decay_steps,
-                                         _END_LEARNING_RATE,
+                                         OPTIMIZATION_PARAMS['end_learning_rate'],
                                          power=1.0,
                                          cycle=False,
                                          name='polynomial_decay_learning_rate')
     else:
         raise ValueError('learning_rate_decay_type [%s] was not recognized',
-                         _LEARNING_RATE_DECAY_TYPE)
+                         OPTIMIZATION_PARAMS['learning_rate_decay_type'])
 
 
 def _configure_optimizer(learning_rate):
@@ -136,13 +164,13 @@ def _configure_optimizer(learning_rate):
     elif _OPTIMIZER == 'momentum':
         optimizer = tf.train.MomentumOptimizer(
             learning_rate,
-            momentum=_MOMENTUM,
+            momentum=OPTIMIZATION_PARAMS['momentum'],
             name='Momentum')
     elif _OPTIMIZER == 'rmsprop':
         optimizer = tf.train.RMSPropOptimizer(
             learning_rate,
             decay=_RMSPROP_DECAY,
-            momentum=_MOMENTUM,
+            momentum=OPTIMIZATION_PARAMS['momentum'],
             epsilon=_OPT_EPSILON)
     elif _OPTIMIZER == 'sgd':
         optimizer = tf.train.GradientDescentOptimizer(learning_rate)
@@ -295,7 +323,8 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
                       trainable_scopes=None,
                       max_train_time_sec=None,
                       max_number_of_steps=None,
-                      log_every_n_steps=None):
+                      log_every_n_steps=None,
+                      optimization_params=None):
     """
     :param root_model_dir: Directory containing the root models pretrained checkpoint files
     :param bot_model_dir: Directory where the transfer learned model's checkpoint files are written to
@@ -307,8 +336,13 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
     :param trainable_scopes: Layers to train from the restored model
     :param max_train_time_sec: time boundary to stop training after in seconds
     :param max_number_of_steps: maximum number of steps to run
+    :param log_every_n_steps:
+    :param optimization_params:
     :return: 
     """
+    if not optimization_params:
+        optimization_params = OPTIMIZATION_PARAMS
+
     if not max_number_of_steps:
         max_number_of_steps = _MAX_NUMBER_OF_STEPS
 
@@ -353,8 +387,9 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
         network_fn = nets_factory.get_network_fn(
             model_name,
             num_classes=(dataset.num_classes - _LABELS_OFFSET),
-            weight_decay=_WEIGHT_DECAY,
-            is_training=True)
+            weight_decay=OPTIMIZATION_PARAMS['weight_decay'],
+            is_training=True,
+            dropout_keep_prob=OPTIMIZATION_PARAMS['dropout_keep_prob'])
 
         #####################################
         # Select the preprocessing function #
@@ -437,10 +472,10 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
         #################################
         # Configure the moving averages #
         #################################
-        if _MOVING_AVERAGE_DECAY:
+        if OPTIMIZATION_PARAMS['moving_average_decay']:
             moving_average_variables = slim.get_model_variables()
             variable_averages = tf.train.ExponentialMovingAverage(
-                _MOVING_AVERAGE_DECAY, global_step)
+                OPTIMIZATION_PARAMS['moving_average_decay'], global_step)
         else:
             moving_average_variables, variable_averages = None, None
 
@@ -462,7 +497,7 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
                 variables_to_average=moving_average_variables,
                 replica_id=tf.constant(_TASK, tf.int32, shape=()),
                 total_num_replicas=_WORKER_REPLICAS)
-        elif _MOVING_AVERAGE_DECAY:
+        elif OPTIMIZATION_PARAMS['moving_average_decay']:
             # Update ops executed locally by trainer.
             update_ops.append(variable_averages.apply(moving_average_variables))
 
@@ -513,11 +548,13 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
             sync_optimizer=optimizer if _SYNC_REPLICAS else None)
 
 
-def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inception_v3',
+def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inception_v4',
           dataset_split_name='train',
           dataset_name='bot',
           max_train_time_sec=None,
-          max_number_of_steps=None):
+          max_number_of_steps=None,
+          log_every_n_steps=None,
+          optimization_params=None):
     """
 
         :param root_model_dir: Directory containing the root models pretrained checkpoint files
@@ -527,7 +564,9 @@ def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inceptio
         :param dataset_split_name: 'train' or 'validation'
         :param dataset_name: triggers the dataset factory to load a bot dataset
         :param max_train_time_sec:
-        :param max_number_of_steps: 
+        :param max_number_of_steps:
+        :parap log_every_n_steps:
+        :param OPTIMIZATION_PARAMS: 
         :return: 
     """
     transfer_learning(root_model_dir=root_model_dir,
@@ -539,7 +578,9 @@ def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inceptio
                       checkpoint_exclude_scopes=None,
                       trainable_scopes=None,
                       max_train_time_sec=max_train_time_sec,
-                      max_number_of_steps=max_number_of_steps)
+                      max_number_of_steps=max_number_of_steps,
+                      optimization_params=None,
+                      log_every_n_steps=log_every_n_steps)
 
 
 if __name__ == '__main__':
