@@ -7,7 +7,7 @@ import os
 import tempfile
 
 import cnn_server.classification.classification_receive_handler as handler
-import slim.transfer_learn_image_classifier as transfer_learning
+import slim.transfer_image_classifier as transfer_learning
 from cnn_server.server import file_service as dirs
 
 TEST_BOT_ID = 'test'

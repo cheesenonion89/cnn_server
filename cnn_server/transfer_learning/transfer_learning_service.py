@@ -1,6 +1,6 @@
 import os
 
-import slim.transfer_learn_image_classifier as transfer_learning
+import slim.transfer_image_classifier as transfer_learning
 from cnn_server.server import file_service as dirs
 
 

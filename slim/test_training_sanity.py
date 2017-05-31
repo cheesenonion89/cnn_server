@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import os
 
-import slim.transfer_learn_image_classifier as trainer
+import slim.transfer_image_classifier as trainer
 from cnn_server.server import file_service as dirs
 
 

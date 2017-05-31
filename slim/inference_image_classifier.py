@@ -29,7 +29,7 @@ def map_predictions_to_labels(bot_id, predictions, return_labels):
     return lbls, probabilities
 
 
-def inference_on_image(bot_id, image_file, network_name='inception_v3', return_labels=1):
+def inference_on_image(bot_id, image_file, network_name='inception_v4', return_labels=1):
     """
     Loads the corresponding model checkpoint, network function and preprocessing routine based on bot_id and network_name,
     restores the graph and runs it to the prediction enpoint with the image as input

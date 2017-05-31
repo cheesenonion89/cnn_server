@@ -4,6 +4,7 @@ PROJECT_ROOT_DIR = '/home/markus/projects/cnn_server/'
 TRAINING_DATA_DIR = os.path.join(PROJECT_ROOT_DIR, 'training_data')
 PROTOBUF_DIR = os.path.join(PROJECT_ROOT_DIR, 'protobuf')
 MODEL_DIR = os.path.join(PROJECT_ROOT_DIR, 'model')
+PERFORMANCE_DIR = os.path.join(PROJECT_ROOT_DIR, 'performance')
 DATASET_DIR = os.path.join(PROJECT_ROOT_DIR, 'datasets')
 DATASET_TRAIN_DIR = os.path.join(DATASET_DIR, 'training')
 DATASET_TEST_DIR = os.path.join(DATASET_DIR, 'test')
@@ -46,6 +47,10 @@ def get_protobuf_dir(bot_id):
 
 def get_model_data_dir(bot_id):
     return os.path.join(MODEL_DIR, folder_name(bot_id))
+
+
+def get_performance_data_dir(bot_id):
+    return os.path.join(PERFORMANCE_DIR, folder_name(bot_id))
 
 
 def get_root_model_dir(model_name=None):
