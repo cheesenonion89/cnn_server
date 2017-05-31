@@ -39,9 +39,9 @@ class TestTrainInception(TestCase):
 
         trainer.train(bot_model_dir=bot_model_dir,
                       protobuf_dir=protobuf_dir,
-                      max_train_time_sec=(60 * 60 * 24 * 2),
+                      max_train_time_sec=(60 * 60 * 24 * 7),
                       optimization_params=None,
-                      log_every_n_steps=2)
+                      log_every_n_steps=10)
         self.assertTrue(True)
 
 
