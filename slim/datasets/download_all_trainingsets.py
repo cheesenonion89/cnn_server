@@ -3,6 +3,7 @@ import os
 import slim.datasets.download_training_data as dl
 from cnn_server.server import file_service as dirs
 
+## Script to download training data for transfer learning from csv files with Flickr Image URL
 
 def _check_file(file):
     if not os.path.isfile(file):

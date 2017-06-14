@@ -7,7 +7,7 @@ import tensorflow as tf
 
 from slim.datasets import dataset_utils
 
-_FRACT_VALIDATION = 0.1
+_FRACT_VALIDATION = 0.2
 _NUM_SHARDS = 5
 _RANDOM_SEED = 0
 
@@ -104,7 +104,11 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, protobuf_dir, nu
                         sys.stdout.flush()
 
                         # Read the filename:
-                        image_data = tf.gfile.FastGFile(filenames[i], 'r').read()
+                        print("Converting image %s" % filenames[i])
+                        try:
+                            image_data = tf.gfile.FastGFile(filenames[i], 'rb').read()
+                        except Exception as e:
+                            print(e)
                         height, width = image_reader.read_image_dims(sess, image_data)
 
                         class_name = os.path.basename(os.path.dirname(filenames[i]))

@@ -2,6 +2,7 @@ import os
 
 PROJECT_ROOT_DIR = '/home/markus/projects/cnn_server/'
 TRAINING_DATA_DIR = os.path.join(PROJECT_ROOT_DIR, 'training_data')
+TRANSFER_DATA_DIR = os.path.join(PROJECT_ROOT_DIR, 'transfer_learning')
 PROTOBUF_DIR = os.path.join(PROJECT_ROOT_DIR, 'protobuf')
 MODEL_DIR = os.path.join(PROJECT_ROOT_DIR, 'model')
 PERFORMANCE_DIR = os.path.join(PROJECT_ROOT_DIR, 'performance')
@@ -39,6 +40,18 @@ def _create_if_not_exists(path):
 
 def get_training_data_dir(bot_id):
     return _create_if_not_exists(os.path.join(TRAINING_DATA_DIR, folder_name(bot_id)))
+
+
+def get_transfer_setting_dir(transfer_setting):
+    return _create_if_not_exists(os.path.join(TRANSFER_DATA_DIR, 'setting_0%s' % transfer_setting))
+
+
+def get_transfer_data_dir(bot_id, transfer_setting):
+    return _create_if_not_exists(os.path.join(get_transfer_setting_dir(transfer_setting), folder_name(bot_id)))
+
+
+def get_readme_file(transfer_setting):
+    return os.path.join(get_transfer_setting_dir(transfer_setting), 'README')
 
 
 def get_protobuf_dir(bot_id):
