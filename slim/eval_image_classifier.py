@@ -28,18 +28,22 @@ def _check_dir(dir_path):
         raise ValueError('%s is empty' % dir_path)
 
 
-def eval(bot_id, dataset_split='validation', dataset_name='bot', model_name='inception_v4', preprocessing=None,
+def eval(bot_id, setting_id=None, dataset_split='validation', dataset_name='bot', model_name='inception_v4',
+         preprocessing=None,
          moving_average_decay=None, tf_master=''):
-    protobuf_dir = dirs.get_protobuf_dir(bot_id)
-    _check_dir(protobuf_dir)
+    if setting_id:
+        protobuf_dir = dirs.get_transfer_proto_dir(bot_id, setting_id)
+        model_dir = dirs.get_transfer_model_dir(bot_id, setting_id)
+    else:
+        protobuf_dir = dirs.get_protobuf_dir(bot_id)
+        model_dir = dirs.get_model_data_dir(bot_id)
 
-    model_dir = dirs.get_model_data_dir(bot_id)
+    _check_dir(protobuf_dir)
     _check_dir(model_dir)
 
     performance_data_dir = dirs.get_performance_data_dir(bot_id)
     if os.listdir(performance_data_dir):
         raise ValueError('%s is not empty' % performance_data_dir)
-
 
     tf.logging.set_verbosity(tf.logging.INFO)
     with tf.Graph().as_default():

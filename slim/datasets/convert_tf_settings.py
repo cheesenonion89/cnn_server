@@ -43,12 +43,14 @@ def _check_proto_dir(pr_dir):
 
 def _convert(bot_id, transfer_setting):
     training_data_dir = dirs.get_transfer_data_dir(bot_id, transfer_setting)
-    protobuf_dir = dirs.get_protobuf_dir(bot_id)
+    protobuf_dir = dirs.get_transfer_proto_dir(bot_id, transfer_setting)
+    '''
     readme_file = dirs.get_readme_file(transfer_setting)
     if not readme_file:
         print('No README found in %s' % training_data_dir)
     if readme_file:
         copyfile(readme_file, os.path.join(protobuf_dir, 'README'))
+    '''
     if _check_training_dir(training_data_dir) and _check_proto_dir(protobuf_dir):
         converter.run(training_data_dir, protobuf_dir, fract_validation=0.2)
 
@@ -62,4 +64,4 @@ def convert_all_trainingsets(transfer_setting):
 
 
 if __name__ == '__main__':
-    convert_all_trainingsets(1)
+    convert_all_trainingsets(2)

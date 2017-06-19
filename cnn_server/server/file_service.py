@@ -11,20 +11,6 @@ DATASET_TRAIN_DIR = os.path.join(DATASET_DIR, 'training')
 DATASET_TEST_DIR = os.path.join(DATASET_DIR, 'test')
 DATASET_TRANSFER_DIR = os.path.join(DATASET_DIR, 'transfer learning')
 
-root_model_map = {
-    'alex_net': 'alex_net',
-    'cifar_net': 'cifar_net',
-    'vgg_19': 'vgg_19',
-    'vgg_19_pretrained': 'vgg_19_pretrained',
-    'inception_v4': 'inception_v4',
-    'inception_v4_pretrained': 'inception_v4_pretrained',
-    'inception_resnet': 'inception_resnet',
-    'inception_resnet_pretrained': 'inception_resnet_pretrained',
-    'lenet': 'lenet',
-    'resnet_v2_152': 'resnet_v2_152',
-    'resnet_v2_152_pretrained': 'resnet_v2_152_pretrained'
-}
-
 FOLDER_PREFIX = 'bot'
 
 
@@ -42,12 +28,23 @@ def get_training_data_dir(bot_id):
     return _create_if_not_exists(os.path.join(TRAINING_DATA_DIR, folder_name(bot_id)))
 
 
-def get_transfer_setting_dir(transfer_setting):
-    return _create_if_not_exists(os.path.join(TRANSFER_DATA_DIR, 'setting_0%s' % transfer_setting))
+def get_transfer_setting_dir(path, transfer_setting):
+    return _create_if_not_exists(os.path.join(path, 'setting_0%s' % transfer_setting))
 
 
 def get_transfer_data_dir(bot_id, transfer_setting):
-    return _create_if_not_exists(os.path.join(get_transfer_setting_dir(transfer_setting), folder_name(bot_id)))
+    return _create_if_not_exists(
+        os.path.join(get_transfer_setting_dir(TRANSFER_DATA_DIR, transfer_setting), folder_name(bot_id)))
+
+
+def get_transfer_proto_dir(bot_id, transfer_setting):
+    return _create_if_not_exists(os.path.join(get_transfer_setting_dir(PROTOBUF_DIR, transfer_setting),
+                                              folder_name(bot_id)))
+
+
+def get_transfer_model_dir(bot_id, transfer_setting):
+    return _create_if_not_exists(os.path.join(get_transfer_setting_dir(MODEL_DIR, transfer_setting),
+                                              folder_name(bot_id)))
 
 
 def get_readme_file(transfer_setting):
@@ -63,24 +60,11 @@ def get_model_data_dir(bot_id):
 
 
 def get_performance_data_dir(bot_id):
-    return os.path.join(PERFORMANCE_DIR, folder_name(bot_id))
+    return _create_if_not_exists(os.path.join(PERFORMANCE_DIR, folder_name(bot_id)))
 
 
-def get_root_model_dir(model_name=None):
-    root_model_dir = os.path.join(MODEL_DIR, 'root')
-    if not os.path.exists(root_model_dir):
-        os.makedirs(root_model_dir)
-    if not model_name:
-        return _create_if_not_exists(os.path.join(root_model_dir, 'inception_v3'))
-    else:
-        if not model_name in root_model_map:
-            print('model_name %s is not defined as root model' % model_name)
-            return None
-        root_model_dir = os.path.join(root_model_dir, model_name)
-        if not os.path.exists(root_model_dir):
-            print("Creating root model directory for model %s" % model_name)
-            os.makedirs(root_model_dir)
-        return _create_if_not_exists(root_model_dir)
+def get_root_model_dir():
+    return _create_if_not_exists(os.path.join(MODEL_DIR, folder_name('root')))
 
 
 def get_root_model_ckpt_path(model_name):

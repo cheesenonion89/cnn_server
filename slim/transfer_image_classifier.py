@@ -200,7 +200,7 @@ def _get_init_fn(root_model_dir, bot_model_dir, checkpoint_exclude_scopes):
     exclusions = []
     if checkpoint_exclude_scopes:
         exclusions = [scope.strip()
-                      for scope in checkpoint_exclude_scopes.split(',')]
+                      for scope in checkpoint_exclude_scopes]
 
     # TODO(sguada) variables.filter_variables()
     variables_to_restore = []
@@ -226,15 +226,15 @@ def _get_init_fn(root_model_dir, bot_model_dir, checkpoint_exclude_scopes):
         ignore_missing_vars=_IGNORE_MISSING_VARS)
 
 
-def _get_variables_to_train():
+def _get_variables_to_train(trainable_scopes):
     """
     
     :return: 
     """
-    if _TRAINABLE_SCOPES is None:
+    if trainable_scopes is None:
         return tf.trainable_variables()
     else:
-        scopes = [scope.strip() for scope in _TRAINABLE_SCOPES.split(',')]
+        scopes = [scope.strip() for scope in trainable_scopes]
 
     variables_to_train = []
     for scope in scopes:
@@ -316,7 +316,7 @@ def train_step(sess, train_op, global_step, train_step_kwargs):
     return total_loss, should_stop
 
 
-def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='inception_v3',
+def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='inception_v4',
                       dataset_split_name='train',
                       dataset_name='bot',
                       checkpoint_exclude_scopes=None,
@@ -324,6 +324,7 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
                       max_train_time_sec=None,
                       max_number_of_steps=None,
                       log_every_n_steps=None,
+                      save_summaries_secs=None,
                       optimization_params=None):
     """
     :param root_model_dir: Directory containing the root models pretrained checkpoint files
@@ -357,6 +358,9 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
 
     if not log_every_n_steps:
         log_every_n_steps = _LOG_EVERY_N_STEPS
+
+    if not save_summaries_secs:
+        save_summaries_secs = _SAVE_SUMMARRIES_SECS
 
     tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -502,7 +506,7 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
             update_ops.append(variable_averages.apply(moving_average_variables))
 
         # Variables to train.
-        variables_to_train = _get_variables_to_train()
+        variables_to_train = _get_variables_to_train(trainable_scopes)
 
         #  and returns a train_tensor and summary_op
         total_loss, clones_gradients = model_deploy.optimize_clones(
@@ -543,7 +547,7 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
             summary_op=summary_op,
             # number_of_steps=max_number_of_steps,
             log_every_n_steps=log_every_n_steps,
-            save_summaries_secs=_SAVE_SUMMARRIES_SECS,
+            save_summaries_secs=save_summaries_secs,
             save_interval_secs=_SAVE_INTERNAL_SECS,
             sync_optimizer=optimizer if _SYNC_REPLICAS else None)
 
@@ -569,6 +573,14 @@ def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inceptio
         :param OPTIMIZATION_PARAMS: 
         :return: 
     """
+    print("""
+            INITIALIZING TRAINING OF \t %s\n
+            READING PROTOBUF FROM: \t %s \n
+            READING MODEL FROM: \t %s \n
+            WRITING MODEL TO: \t %s \n
+            """
+          % (model_name, protobuf_dir, root_model_dir, bot_model_dir))
+
     transfer_learning(root_model_dir=root_model_dir,
                       bot_model_dir=bot_model_dir,
                       protobuf_dir=protobuf_dir,
