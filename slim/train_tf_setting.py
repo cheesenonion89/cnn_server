@@ -52,7 +52,7 @@ def train(setting_id, bot_id):
             model_name='inception_v4',
             checkpoint_exclude_scopes=['InceptionV4/Logits', 'InceptionV4/AuxLogits'],
             trainable_scopes=['InceptionV4/Logits', 'InceptionV4/AuxLogits'],
-            max_train_time_sec=(60 * 60 * 5),  # seconds * minutes * hours * days
+            max_train_time_sec=(60 * 60 * 24),  # seconds * minutes * hours * days
             optimization_params=None,
             log_every_n_steps=10,
             save_summaries_secs=600

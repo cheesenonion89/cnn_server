@@ -46,7 +46,9 @@ def train(bot_id, max_number_of_steps=None, test=False, max_train_time=None):
         protobuf_dir=bot_protobuf_dir,
         dataset_name='bot',
         dataset_split_name='train',
-        model_name='inception_v3',
+        model_name='inception_v4',
+        checkpoint_exclude_scopes=['InceptionV4/Logits', 'InceptionV4/AuxLogits'],
+        trainable_scopes=['InceptionV4/Logits', 'InceptionV4/AuxLogits'],
         max_train_time_sec=max_train_time
     )
 

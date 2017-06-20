@@ -2,7 +2,7 @@ from slim import train_tf_setting as trainer
 
 bots_setting_01 = ['cars', 'bmw_models', 'car_types']
 bots_setting_02 = ['cars', 'bmw_models', 'car_types', 'seasons']
-settings = [bots_setting_01, bots_setting_02]
+settings = [bots_setting_02]
 
 
 for index, bot_ids in enumerate(settings):

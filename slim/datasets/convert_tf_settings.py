@@ -6,6 +6,7 @@ from shutil import copyfile
 import slim.datasets.convert_to_protobuf as converter
 from cnn_server.server import file_service as dirs
 
+
 BOT_IDS = [
     'cars',
     'seasons',
