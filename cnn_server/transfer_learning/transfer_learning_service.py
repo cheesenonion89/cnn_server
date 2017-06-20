@@ -4,12 +4,11 @@ import slim.transfer_image_classifier as transfer_learning
 from cnn_server.server import file_service as dirs
 
 
-def train(bot_id, max_number_of_steps=None, test=False, max_train_time=None):
+def train(bot_id, test=False, max_train_time=None):
     if test:
-        root_model_dir = dirs.get_test_root_model_dir()
-        max_number_of_steps = 1
-    else:
-        root_model_dir = dirs.get_root_model_dir()
+        max_train_time = 60
+
+    root_model_dir = dirs.get_root_model_dir()
     bot_model_dir = dirs.get_model_data_dir(bot_id)
     bot_protobuf_dir = dirs.get_protobuf_dir(bot_id)
 
