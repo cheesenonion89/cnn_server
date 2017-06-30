@@ -42,9 +42,9 @@ def get_transfer_proto_dir(bot_id, transfer_setting):
                                               folder_name(bot_id)))
 
 
-def get_transfer_model_dir(bot_id, transfer_setting):
+def get_transfer_model_dir(bot_id, transfer_setting, suffix=''):
     return _create_if_not_exists(os.path.join(get_transfer_setting_dir(MODEL_DIR, transfer_setting),
-                                              folder_name(bot_id)))
+                                              '%s%s' % (folder_name(bot_id).replace('/', ''), suffix)))
 
 
 def get_readme_file(transfer_setting):
@@ -65,6 +65,10 @@ def get_performance_data_dir(bot_id):
 
 def get_root_model_dir():
     return _create_if_not_exists(os.path.join(MODEL_DIR, folder_name('root')))
+
+
+def get_imagenet_model_dir():
+    return _create_if_not_exists(os.path.join(MODEL_DIR, folder_name('imagenet')))
 
 
 def get_root_model_ckpt_path(model_name):

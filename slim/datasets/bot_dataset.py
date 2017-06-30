@@ -60,6 +60,8 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
         file_pattern = _FILE_PATTERN
     file_pattern = os.path.join(dataset_dir, file_pattern % split_name)
 
+    print("FILE PATTERN: %s" %file_pattern)
+
     # Allowing None in the signature so that dataset_factory can use the default.
     if reader is None:
         reader = tf.TFRecordReader
@@ -84,9 +86,10 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
         labels_to_names = dataset_utils.read_label_file(dataset_dir)
 
     bot_id = dirs.get_bot_id_from_dir(dataset_dir)
-    training_data_dir = dirs.get_training_data_dir(bot_id)
+    training_data_dir = dirs.get_transfer_data_dir(bot_id, 2)
     if not bot_id:
         raise ValueError('bot id not recognized from dataset_dir %s' % dataset_dir)
+
 
     split_size = dataset_utils.get_split_size(
         training_data_dir, split_name

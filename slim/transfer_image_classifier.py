@@ -558,6 +558,7 @@ def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inceptio
           max_train_time_sec=None,
           max_number_of_steps=None,
           log_every_n_steps=None,
+          save_summaries_secs=None,
           optimization_params=None):
     """
 

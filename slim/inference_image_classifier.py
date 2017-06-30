@@ -9,7 +9,7 @@ from slim.preprocessing import preprocessing_factory as preprocessing_factory
 slim = tf.contrib.slim
 
 
-def map_predictions_to_labels(bot_id, predictions, return_labels):
+def map_predictions_to_labels(protobuf_dir, predictions, return_labels):
     """
     Utility function to map the output of the prediction endpoint to the corresponding labels
     :param bot_id: 
@@ -18,7 +18,8 @@ def map_predictions_to_labels(bot_id, predictions, return_labels):
     :return: 
     """
     labels = []
-    for line in open(os.path.join(dirs.get_protobuf_dir(bot_id), 'labels.txt')):
+
+    for line in open(os.path.join(protobuf_dir, 'labels.txt')):
         labels.append(line.split(':')[1].replace('\n', ''))
 
     # Get the indices of the n predictions with highest score
@@ -29,7 +30,7 @@ def map_predictions_to_labels(bot_id, predictions, return_labels):
     return lbls, probabilities
 
 
-def inference_on_image(bot_id, image_file, network_name='inception_v4', return_labels=1):
+def inference_on_image(bot_id, suffix, setting_id, image_file, network_name='inception_v4', return_labels=1):
     """
     Loads the corresponding model checkpoint, network function and preprocessing routine based on bot_id and network_name,
     restores the graph and runs it to the prediction enpoint with the image as input
@@ -41,10 +42,10 @@ def inference_on_image(bot_id, image_file, network_name='inception_v4', return_l
     """
 
     # Get the model path
-    model_path = dirs.get_model_data_dir(bot_id)
+    model_path = dirs.get_transfer_model_dir(bot_id+suffix, setting_id)
 
     # Get number of classes to predict
-    protobuf_dir = dirs.get_protobuf_dir(bot_id)
+    protobuf_dir = dirs.get_transfer_proto_dir(bot_id, setting_id)
     number_of_classes = dataset_utils.get_number_of_classes_by_labels(protobuf_dir)
 
     # Get the preprocessing and network construction functions
@@ -78,4 +79,4 @@ def inference_on_image(bot_id, image_file, network_name='inception_v4', return_l
         # Get the numpy array of predictions out of the
         predictions = endpoints['Predictions'].eval()[0]
 
-    return map_predictions_to_labels(bot_id, predictions, return_labels)
+    return map_predictions_to_labels(protobuf_dir, predictions, return_labels)

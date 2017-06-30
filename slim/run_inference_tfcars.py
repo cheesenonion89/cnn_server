@@ -3,14 +3,14 @@ import os
 from slim import inference_image_classifier as classifier
 
 DATA_DIR = 'test_images/'
-test_images = {
-    'lambo_01': os.path.join(DATA_DIR, 'lambo01.jpg')
-}
+test_images = ['fone04.jpg']
 
 
 def main():
     for test_image in test_images:
-        print(classifier.inference_on_image('root', test_image, return_labels=5))
+        img = os.path.join(DATA_DIR, test_image)
+        print(classifier.inference_on_image(bot_id='', suffix='', setting_id=2, image_file=img,
+                                            return_labels=1))
         print('#############################################################')
 
 

@@ -28,7 +28,7 @@ def _check_dir(dir_path):
         raise ValueError('%s is empty' % dir_path)
 
 
-def eval(bot_id, bot_suffix, setting_id=None, dataset_split='validation', dataset_name='bot', model_name='inception_v4',
+def eval(bot_id, bot_suffix, setting_id=None, dataset_split='train', dataset_name='bot', model_name='inception_v4',
          preprocessing=None,
          moving_average_decay=None, tf_master=''):
     full_id = bot_id + bot_suffix
@@ -138,12 +138,7 @@ def eval(bot_id, bot_suffix, setting_id=None, dataset_split='validation', datase
         else:
             checkpoint_path = model_dir
 
-        tf.logging.info('Evaluating %s' % checkpoint_path)
+        print(dataset.num_samples)
+        print(dataset.num_classes)
 
-        slim.evaluation.evaluate_once(
-            master=tf_master,
-            checkpoint_path=checkpoint_path,
-            logdir=performance_data_dir,
-            num_evals=num_batches,
-            eval_op=list(names_to_updates.values()),
-            variables_to_restore=variables_to_restore)
+eval('bmw_models', '', 2)
