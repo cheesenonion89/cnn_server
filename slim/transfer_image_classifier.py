@@ -593,6 +593,7 @@ def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inceptio
                       max_train_time_sec=max_train_time_sec,
                       max_number_of_steps=max_number_of_steps,
                       optimization_params=None,
+                      save_summaries_secs=save_summaries_secs,
                       log_every_n_steps=log_every_n_steps)
 
 

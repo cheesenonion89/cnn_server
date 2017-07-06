@@ -28,21 +28,18 @@ def _check_dir(dir_path):
         raise ValueError('%s is empty' % dir_path)
 
 
-def eval(bot_id, bot_suffix, setting_id=None, dataset_split='train', dataset_name='bot', model_name='inception_v4',
+def eval(bot_id, bot_suffix, setting_id=None, dataset_split='validation', dataset_name='bot', model_name='inception_v4',
          preprocessing=None,
          moving_average_decay=None, tf_master=''):
     full_id = bot_id + bot_suffix
     if setting_id:
         protobuf_dir = dirs.get_transfer_proto_dir(bot_id, setting_id)
-        model_dir = dirs.get_transfer_model_dir(full_id, setting_id)
     else:
         protobuf_dir = dirs.get_protobuf_dir(bot_id)
-        model_dir = dirs.get_model_data_dir(full_id)
 
     _check_dir(protobuf_dir)
-    _check_dir(model_dir)
 
-    print("READIND FROM %s AND %s" %(protobuf_dir, model_dir))
+    print("READIND FROM %s" %(protobuf_dir))
 
     performance_data_dir = dirs.get_performance_data_dir(bot_id)
     #    if os.listdir(performance_data_dir):
@@ -133,12 +130,8 @@ def eval(bot_id, bot_suffix, setting_id=None, dataset_split='train', dataset_nam
             # This ensures that we make a single pass over all of the data.
             num_batches = math.ceil(dataset.num_samples / float(BATCH_SIZE))
 
-        if tf.gfile.IsDirectory(model_dir):
-            checkpoint_path = tf.train.latest_checkpoint(model_dir)
-        else:
-            checkpoint_path = model_dir
 
         print(dataset.num_samples)
         print(dataset.num_classes)
 
-eval('bmw_models', '', 2)
+eval('cars', '', setting_id=5)

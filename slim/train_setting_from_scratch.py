@@ -35,7 +35,7 @@ def _check_bot_model_dir(bot_model_dir):
     return True
 
 
-def train(setting_id, bot_id):
+def train(setting_id, bot_id, hours=24, minutes=60, seconds=60, summary_secs=60):
     # root_model_dir = dirs.get_root_model_dir()
 
     bot_protobuf_dir = dirs.get_transfer_proto_dir(bot_id, setting_id)
@@ -55,8 +55,8 @@ def train(setting_id, bot_id):
             bot_model_dir=bot_model_dir,
             protobuf_dir=bot_protobuf_dir,
             model_name='inception_v4',
-            max_train_time_sec=(60 * 60 * 24),  # seconds * minutes * hours * days
+            max_train_time_sec=(seconds * minutes * hours),  # seconds * minutes * hours * days
             optimization_params=None,
             log_every_n_steps=10,
-            save_summaries_secs=600
+            save_summaries_secs=summary_secs
         )

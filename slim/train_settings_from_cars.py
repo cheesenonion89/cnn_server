@@ -1,4 +1,4 @@
-from slim import train_tf_setting as trainer
+from slim import train_setting_from_cars as trainer
 
 bots_setting_01 = ['cars', 'bmw_models', 'car_types']
 bots_setting_02 = ['cars', 'bmw_models', 'car_types', 'seasons']
