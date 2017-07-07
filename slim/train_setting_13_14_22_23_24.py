@@ -1,0 +1,73 @@
+from slim import train_setting_from_cars as train_from_cars
+from slim import train_setting_from_imagenet as train_from_imagenet
+from slim import train_setting_from_scratch as train_from_scratch
+
+train_from_cars.train(13, 'cars', hours=1)
+train_from_imagenet.train(13, 'cars', hours=1)
+train_from_scratch.train(13, 'cars', hours=1)
+train_from_cars.train(13, 'bmw_models', hours=1)
+train_from_imagenet.train(13, 'bmw_models', hours=1)
+train_from_scratch.train(13, 'bmw_models', hours=1)
+train_from_cars.train(13, 'car_types', hours=1)
+train_from_imagenet.train(13, 'car_types', hours=1)
+train_from_scratch.train(13, 'car_types', hours=1)
+train_from_cars.train(13, 'seasons', hours=1)
+train_from_imagenet.train(13, 'seasons', hours=1)
+train_from_scratch.train(13, 'seasons', hours=1)
+
+'''
+train_from_cars.train(14, 'cars', hours=1)
+train_from_imagenet.train(14, 'cars', hours=1)
+train_from_scratch.train(14, 'cars', hours=1)
+train_from_cars.train(14, 'bmw_models', hours=1)
+train_from_imagenet.train(14, 'bmw_models', hours=1)
+train_from_scratch.train(14, 'bmw_models', hours=1)
+train_from_cars.train(14, 'car_types', hours=1)
+train_from_imagenet.train(14, 'car_types', hours=1)
+train_from_scratch.train(14, 'car_types', hours=1)
+train_from_cars.train(14, 'seasons', hours=1)
+train_from_imagenet.train(14, 'seasons', hours=1)
+train_from_scratch.train(14, 'seasons', hours=1)
+'''
+'''
+train_from_cars.train(22, 'cars', hours=1)
+train_from_imagenet.train(22, 'cars', hours=1)
+train_from_scratch.train(22, 'cars', hours=1)
+train_from_cars.train(22, 'bmw_models', hours=1)
+train_from_imagenet.train(22, 'bmw_models', hours=1)
+train_from_scratch.train(22, 'bmw_models', hours=1)
+train_from_cars.train(22, 'car_types', hours=1)
+train_from_imagenet.train(22, 'car_types', hours=1)
+train_from_scratch.train(22, 'car_types', hours=1)
+train_from_cars.train(22, 'seasons', hours=1)
+train_from_imagenet.train(22, 'seasons', hours=1)
+train_from_scratch.train(22, 'seasons', hours=1)
+'''
+
+'''
+train_from_cars.train(23, 'cars', hours=1)
+train_from_imagenet.train(23, 'cars', hours=1)
+train_from_scratch.train(23, 'cars', hours=1)
+train_from_cars.train(23, 'bmw_models', hours=1)
+train_from_imagenet.train(23, 'bmw_models', hours=1)
+train_from_scratch.train(23, 'bmw_models', hours=1)
+train_from_cars.train(23, 'car_types', hours=1)
+train_from_imagenet.train(23, 'car_types', hours=1)
+train_from_scratch.train(23, 'car_types', hours=1)
+train_from_cars.train(23, 'seasons', hours=1)
+train_from_imagenet.train(23, 'seasons', hours=1)
+train_from_scratch.train(23, 'seasons', hours=1)
+'''
+
+train_from_cars.train(24, 'cars', hours=1)
+train_from_imagenet.train(24, 'cars', hours=1)
+train_from_scratch.train(24, 'cars', hours=1)
+train_from_cars.train(24, 'bmw_models', hours=1)
+train_from_imagenet.train(24, 'bmw_models', hours=1)
+train_from_scratch.train(24, 'bmw_models', hours=1)
+train_from_cars.train(24, 'car_types', hours=1)
+train_from_imagenet.train(24, 'car_types', hours=1)
+train_from_scratch.train(24, 'car_types', hours=1)
+train_from_cars.train(24, 'seasons', hours=1)
+train_from_imagenet.train(24, 'seasons', hours=1)
+train_from_scratch.train(24, 'seasons', hours=1)

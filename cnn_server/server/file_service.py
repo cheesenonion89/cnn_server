@@ -25,11 +25,14 @@ def _create_if_not_exists(path):
 
 
 def get_training_data_dir(bot_id):
-    return _create_if_not_exists(os.path.join(TRAINING_DATA_DIR, folder_name(bot_id)))
+    return os.path.join(TRAINING_DATA_DIR, folder_name(bot_id))
 
 
 def get_transfer_setting_dir(path, transfer_setting):
-    return _create_if_not_exists(os.path.join(path, 'setting_0%s' % transfer_setting))
+    if transfer_setting < 10:
+        return _create_if_not_exists(os.path.join(path, 'setting_0%s' % transfer_setting))
+    if transfer_setting >= 10:
+        return _create_if_not_exists(os.path.join(path, 'setting_%s' % transfer_setting))
 
 
 def get_transfer_data_dir(bot_id, transfer_setting):
@@ -136,3 +139,10 @@ def get_test_training_file():
 
 def get_bot_id_from_dir(dir_name: str):
     return dir_name.split('/')[-2].replace('bot_', '')
+
+
+def get_setting_id_from_dir(dir_name: str):
+    setting_id = dir_name.split('/')[-3].replace('setting_', '')
+    if setting_id.startswith('0'):
+        setting_id = setting_id[1:]
+    return int(setting_id)

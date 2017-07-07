@@ -28,12 +28,13 @@ def _check_dir(dir_path):
         raise ValueError('%s is empty' % dir_path)
 
 
-def eval(bot_id, bot_suffix, setting_id=None, dataset_split='validation', dataset_name='bot', model_name='inception_v4',
+def eval(bot_id, bot_suffix, setting_id=None, validation_setting=2, dataset_split='validation', dataset_name='bot',
+         model_name='inception_v4',
          preprocessing=None,
          moving_average_decay=None, tf_master=''):
     full_id = bot_id + bot_suffix
     if setting_id:
-        protobuf_dir = dirs.get_transfer_proto_dir(bot_id, setting_id)
+        protobuf_dir = dirs.get_transfer_proto_dir(bot_id, validation_setting)
         model_dir = dirs.get_transfer_model_dir(full_id, setting_id)
     else:
         protobuf_dir = dirs.get_protobuf_dir(bot_id)
@@ -42,7 +43,7 @@ def eval(bot_id, bot_suffix, setting_id=None, dataset_split='validation', datase
     _check_dir(protobuf_dir)
     _check_dir(model_dir)
 
-    print("READIND FROM %s AND %s" %(protobuf_dir, model_dir))
+    print("READIND FROM %s AND %s" % (protobuf_dir, model_dir))
 
     performance_data_dir = dirs.get_performance_data_dir(bot_id)
     #    if os.listdir(performance_data_dir):

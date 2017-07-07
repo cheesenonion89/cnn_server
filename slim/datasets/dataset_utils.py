@@ -164,7 +164,7 @@ def get_number_of_classes_by_labels(protobuf_dir):
         return ndx + 1
 
 
-def get_split_size(training_data_dir, split_name, frac_validation=0.1):
+def get_split_size(training_data_dir, split_name, frac_validation=0.0):
     split_fracs = {
         'train': (1 - frac_validation),
         'validation': frac_validation

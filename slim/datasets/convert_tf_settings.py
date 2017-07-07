@@ -45,6 +45,9 @@ def _check_proto_dir(pr_dir):
 def _convert(bot_id, transfer_setting):
     training_data_dir = dirs.get_transfer_data_dir(bot_id, transfer_setting)
     protobuf_dir = dirs.get_transfer_proto_dir(bot_id, transfer_setting)
+
+    print("READING FROM TRAINING DATA DIR: %s \n WRITING TO PROTOBUF DIR: %s" %(training_data_dir, protobuf_dir))
+
     '''
     readme_file = dirs.get_readme_file(transfer_setting)
     if not readme_file:
@@ -53,7 +56,7 @@ def _convert(bot_id, transfer_setting):
         copyfile(readme_file, os.path.join(protobuf_dir, 'README'))
     '''
     if _check_training_dir(training_data_dir) and _check_proto_dir(protobuf_dir):
-        converter.run(training_data_dir, protobuf_dir, fract_validation=0.2)
+        converter.run(training_data_dir, protobuf_dir, fract_validation=0.0)
 
 
 def convert_all_trainingsets(transfer_setting):
@@ -65,4 +68,4 @@ def convert_all_trainingsets(transfer_setting):
 
 
 if __name__ == '__main__':
-    convert_all_trainingsets(2)
+    convert_all_trainingsets(28)
