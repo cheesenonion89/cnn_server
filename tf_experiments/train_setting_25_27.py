@@ -1,0 +1,28 @@
+from tf_experiments import train_setting_from_scratch as train_from_scratch, \
+    train_setting_from_imagenet as train_from_imagenet, train_setting_from_cars as train_from_cars
+
+train_from_cars.train(25, 'cars', hours=1)
+train_from_imagenet.train(25, 'cars', hours=1)
+train_from_scratch.train(25, 'cars', hours=1)
+train_from_cars.train(25, 'bmw_models', hours=1)
+train_from_imagenet.train(25, 'bmw_models', hours=1)
+train_from_scratch.train(25, 'bmw_models', hours=1)
+train_from_cars.train(25, 'car_types', hours=1)
+train_from_imagenet.train(25, 'car_types', hours=1)
+train_from_scratch.train(25, 'car_types', hours=1)
+train_from_cars.train(25, 'seasons', hours=1)
+train_from_imagenet.train(25, 'seasons', hours=1)
+train_from_scratch.train(25, 'seasons', hours=1)
+
+train_from_cars.train(27, 'cars', hours=1)
+train_from_imagenet.train(27, 'cars', hours=1)
+train_from_scratch.train(27, 'cars', hours=1)
+train_from_cars.train(27, 'bmw_models', hours=1)
+train_from_imagenet.train(27, 'bmw_models', hours=1)
+train_from_scratch.train(27, 'bmw_models', hours=1)
+train_from_cars.train(27, 'car_types', hours=1)
+train_from_imagenet.train(27, 'car_types', hours=1)
+train_from_scratch.train(27, 'car_types', hours=1)
+train_from_cars.train(27, 'seasons', hours=1)
+train_from_imagenet.train(27, 'seasons', hours=1)
+train_from_scratch.train(27, 'seasons', hours=1)

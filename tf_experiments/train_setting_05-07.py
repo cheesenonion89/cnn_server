@@ -1,6 +1,5 @@
-from slim import train_setting_from_cars as train_from_cars
-from slim import train_setting_from_imagenet as train_from_imagenet
-from slim import train_setting_from_scratch as train_from_scratch
+from tf_experiments import train_setting_from_scratch as train_from_scratch, \
+    train_setting_from_imagenet as train_from_imagenet, train_setting_from_cars as train_from_cars
 
 # train_from_cars.train(5, 'cars', hours=1, minutes=10, summary_secs=20)
 # train_from_imagenet.train(5, 'cars', hours=1, minutes=10, summary_secs=20)
@@ -54,3 +53,4 @@ train_from_scratch.train(8, 'car_types', hours=1, minutes=1, seconds=6, summary_
 train_from_cars.train(8, 'seasons', hours=1, minutes=1, seconds=6, summary_secs=1)
 train_from_imagenet.train(8, 'seasons', hours=1, minutes=1, seconds=6, summary_secs=1)
 train_from_scratch.train(8, 'seasons', hours=1, minutes=1, seconds=6, summary_secs=1)
+

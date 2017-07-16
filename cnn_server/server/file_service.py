@@ -142,6 +142,8 @@ def get_bot_id_from_dir(dir_name: str):
 
 
 def get_setting_id_from_dir(dir_name: str):
+    if 'setting' not in dir_name:
+        return None
     setting_id = dir_name.split('/')[-3].replace('setting_', '')
     if setting_id.startswith('0'):
         setting_id = setting_id[1:]

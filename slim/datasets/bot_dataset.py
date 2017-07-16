@@ -87,14 +87,19 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
 
     bot_id = dirs.get_bot_id_from_dir(dataset_dir)
     setting_id = dirs.get_setting_id_from_dir(dataset_dir)
-    training_data_dir = ''
-    if split_name == 'train':
-        training_data_dir = dirs.get_transfer_data_dir(bot_id, setting_id)
-        print("READING TRAINING DATA FROM: %s" % training_data_dir)
 
-    if split_name == 'validation':
-        training_data_dir = dirs.get_transfer_data_dir(bot_id, 2)
-        print("READING VALIDATION DATA FROM: %s" % training_data_dir)
+    training_data_dir = ''
+    if setting_id:
+        if split_name == 'train':
+            training_data_dir = dirs.get_transfer_data_dir(bot_id, setting_id)
+            print("READING TRAINING DATA FROM: %s" % training_data_dir)
+
+        if split_name == 'validation':
+            training_data_dir = dirs.get_transfer_data_dir(bot_id, 2)
+            print("READING VALIDATION DATA FROM: %s" % training_data_dir)
+    else:
+        training_data_dir = dirs.get_training_data_dir(bot_id)
+        print("READING TRAINING DATA FROM: %s" % training_data_dir)
 
     if not bot_id:
         raise ValueError('bot id not recognized from dataset_dir %s' % dataset_dir)

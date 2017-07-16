@@ -1,4 +1,4 @@
-from slim import train_setting_from_imagenet as trainer
+from tf_experiments import train_setting_from_imagenet as trainer
 
 bots_setting_02 = ['cars', 'bmw_models', 'car_types', 'seasons']
 

@@ -25,7 +25,7 @@ _NUM_PS_TASKS = 0
 
 # Preprocessing
 _NUM_READERS = 4
-_BATCH_SIZE = 32
+_BATCH_SIZE = 1
 _NUM_PREPROCESSING_THREADS = 4
 
 # Loss Function

@@ -9,4 +9,5 @@ for bot_id in bot_ids:
         print("####################################################################################################\n")
         print("EVALUATING BOT: bot_%s%s" % (bot_id, suffix))
         print("\n####################################################################################################")
-        evaluator.eval(bot_id=bot_id, bot_suffix=suffix, setting_id=21)
+        evaluator.eval(bot_id=bot_id, bot_suffix=suffix,
+                       setting_id=43)

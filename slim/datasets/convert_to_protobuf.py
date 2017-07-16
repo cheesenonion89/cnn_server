@@ -8,7 +8,7 @@ import tensorflow as tf
 from slim.datasets import dataset_utils
 
 _FRACT_VALIDATION = 0.2
-_NUM_SHARDS = 5
+_NUM_SHARDS = 1
 _RANDOM_SEED = 0
 
 

@@ -68,4 +68,4 @@ def convert_all_trainingsets(transfer_setting):
 
 
 if __name__ == '__main__':
-    convert_all_trainingsets(28)
+    convert_all_trainingsets(25)
