@@ -2,7 +2,7 @@ from flask_restful import Resource
 
 from cnn_server.transfer_learning import transfer_learning_receive_handler as handler
 
-_DEFAULT_TRAIN_TIME = (60 * 60)
+_DEFAULT_TRAIN_TIME = (60 * 5)  # 5 Minutes
 _TEST = False
 
 

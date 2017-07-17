@@ -5,7 +5,7 @@ import tempfile
 import slim.inference_image_classifier as classifier
 
 
-def classify_image(bot_id, image, return_labels=1):
+def classify_image(bot_id, image, return_labels=None):
     """
     Decodes the byte representation of a base64 encoded image and passes the result to the image classifier, together 
     with the bot id and the number of labels to return
@@ -21,7 +21,7 @@ def classify_image(bot_id, image, return_labels=1):
     )
 
     labels, probabilities = classifier.inference_on_image(bot_id, os.path.join(tempfile.gettempdir(), temp_file.name),
-                                                          network_name='inception_v3', return_labels=return_labels)
+                                                          network_name='inception_v4', return_labels=return_labels)
 
     temp_file.close()
 

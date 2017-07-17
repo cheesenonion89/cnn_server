@@ -1,3 +1,4 @@
+import base64
 import os
 
 PROJECT_ROOT_DIR = '/home/markus/projects/cnn_server/'
@@ -10,6 +11,7 @@ DATASET_DIR = os.path.join(PROJECT_ROOT_DIR, 'datasets')
 DATASET_TRAIN_DIR = os.path.join(DATASET_DIR, 'training')
 DATASET_TEST_DIR = os.path.join(DATASET_DIR, 'test')
 DATASET_TRANSFER_DIR = os.path.join(DATASET_DIR, 'transfer learning')
+INFERENCE_DATA_DIR = os.path.join(PROJECT_ROOT_DIR, 'inference_data')
 
 FOLDER_PREFIX = 'bot'
 
@@ -59,7 +61,7 @@ def get_protobuf_dir(bot_id):
 
 
 def get_model_data_dir(bot_id):
-    return os.path.join(MODEL_DIR, folder_name(bot_id))
+    return _create_if_not_exists(os.path.join(MODEL_DIR, folder_name(bot_id)))
 
 
 def get_performance_data_dir(bot_id):
@@ -148,3 +150,13 @@ def get_setting_id_from_dir(dir_name: str):
     if setting_id.startswith('0'):
         setting_id = setting_id[1:]
     return int(setting_id)
+
+
+def get_inference_data_dir(bot_id):
+    return _create_if_not_exists(os.path.join(INFERENCE_DATA_DIR, folder_name(bot_id)))
+
+
+def persist_image(file_name, base64_image):
+    f = open(file_name, 'wb')
+    f.write(base64.b64decode(base64_image))
+    f.close()

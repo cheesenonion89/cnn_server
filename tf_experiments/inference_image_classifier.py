@@ -1,5 +1,3 @@
-import multiprocessing
-from multiprocessing import Manager
 import os
 import tensorflow as tf
 
@@ -11,7 +9,7 @@ from slim.preprocessing import preprocessing_factory as preprocessing_factory
 slim = tf.contrib.slim
 
 
-def map_predictions_to_labels(protobuf_dir, predictions, return_labels=None):
+def map_predictions_to_labels(protobuf_dir, predictions, return_labels = None):
     """
     Utility function to map the output of the prediction endpoint to the corresponding labels
     :param bot_id: 
@@ -35,17 +33,7 @@ def map_predictions_to_labels(protobuf_dir, predictions, return_labels=None):
     return lbls, probabilities
 
 
-def inference_on_image(bot_id, image_file, network_name='inception_v4', return_labels=1):
-    manager = Manager()
-    prediction_dict = manager.dict()
-    process = multiprocessing.Process(target=infere, args=(bot_id, image_file, network_name, return_labels, prediction_dict))
-    process.start()
-    process.join()
-    print(prediction_dict)
-    return prediction_dict['predictions']
-
-
-def infere(bot_id, image_file, network_name='inception_v4', return_labels=1, prediction_dict=[]):
+def inference_on_image(bot_id, suffix, setting_id, image_file, network_name='inception_v4', return_labels=1):
     """
     Loads the corresponding model checkpoint, network function and preprocessing routine based on bot_id and network_name,
     restores the graph and runs it to the prediction enpoint with the image as input
@@ -54,11 +42,13 @@ def infere(bot_id, image_file, network_name='inception_v4', return_labels=1, pre
     :param network_name: name of the network type to be used
     :param return_labels: number of labels to return
     :return: the top n labels with probabilities, where n = return_labels
-    """  # Get the model path
-    model_path = dirs.get_model_data_dir(bot_id)
+    """
+
+    # Get the model path
+    model_path = dirs.get_transfer_model_dir(bot_id+suffix, setting_id)
 
     # Get number of classes to predict
-    protobuf_dir = dirs.get_protobuf_dir(bot_id)
+    protobuf_dir = dirs.get_transfer_proto_dir(bot_id, setting_id)
     number_of_classes = dataset_utils.get_number_of_classes_by_labels(protobuf_dir)
 
     # Get the preprocessing and network construction functions
@@ -79,6 +69,7 @@ def infere(bot_id, image_file, network_name='inception_v4', return_labels=1, pre
     # Create the network up to the Predictions Endpoint
     logits, endpoints = network_fn(input_batch)
 
+    # Create a Saver() object to restore the network from the last checkpoint
     restorer = tf.train.Saver()
 
     with tf.Session() as sess:
@@ -90,7 +81,5 @@ def infere(bot_id, image_file, network_name='inception_v4', return_labels=1, pre
 
         # Get the numpy array of predictions out of the
         predictions = endpoints['Predictions'].eval()[0]
-        sess.close()
-        graph = endpoints['Predictions'].graph
 
-        prediction_dict['predictions'] = map_predictions_to_labels(protobuf_dir, predictions, return_labels)
+    return map_predictions_to_labels(protobuf_dir, predictions, return_labels)

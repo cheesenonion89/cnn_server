@@ -5,7 +5,7 @@ import tensorflow as tf
 import tensorflow.contrib.slim as slim
 
 from cnn_server.server import file_service as dirs
-from slim.datasets import dataset_factory
+from tf_experiments.datasets import dataset_factory
 from slim.nets import nets_factory
 from slim.preprocessing import preprocessing_factory
 

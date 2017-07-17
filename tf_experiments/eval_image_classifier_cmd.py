@@ -21,7 +21,7 @@ from __future__ import print_function
 import math
 import tensorflow as tf
 
-from slim.datasets import dataset_factory
+from tf_experiments.datasets import dataset_factory
 from slim.nets import nets_factory
 from slim.preprocessing import preprocessing_factory
 

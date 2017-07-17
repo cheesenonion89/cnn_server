@@ -14,12 +14,7 @@ class Classifier(Resource):
         :param bot_id: Id of the Bot to identify the correct Model
         :return: HTTP Response with the classification result or an Error
         """
-        if not request.files['image']:
-            return "Image File is missing", 400
+        response = request.get_json(force=True)
+        base64_image = response['base64Image']
 
-        image = request.files['image']
-
-        if request.form['return_labels']:
-            return handler.handle_post(bot_id, image, request.form['return_labels'])
-        else:
-            return handler.handle_post(bot_id, image)
+        return handler.handle_post(bot_id, base64_image)

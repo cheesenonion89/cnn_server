@@ -6,7 +6,7 @@ from cnn_server.server import file_service as dirs
 
 def train(bot_id, test=False, max_train_time=None):
     if test:
-        max_train_time = 60
+        max_train_time = 60 # If we run a test, train for one minute only
 
     root_model_dir = dirs.get_root_model_dir()
     bot_model_dir = dirs.get_model_data_dir(bot_id)

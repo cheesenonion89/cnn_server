@@ -37,8 +37,6 @@ _ITEMS_TO_DESCRIPTIONS = {
     'label': 'A single integer between 0 and nr of classes'
 }
 
-_SPLIT_FRAC = 0.1  # 10% of the data are used for a test set
-
 
 def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
     """
@@ -88,15 +86,31 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
         labels_to_names = dataset_utils.read_label_file(dataset_dir)
 
     bot_id = dirs.get_bot_id_from_dir(dataset_dir)
+    setting_id = dirs.get_setting_id_from_dir(dataset_dir)
 
-    training_data_dir = dirs.get_training_data_dir(bot_id)
-    print("READING TRAINING DATA FROM: %s" % training_data_dir)
+    training_data_dir = ''
+    if setting_id:
+        if split_name == 'train':
+            training_data_dir = dirs.get_transfer_data_dir(bot_id, setting_id)
+            print("READING TRAINING DATA FROM: %s" % training_data_dir)
+
+        if split_name == 'validation':
+            training_data_dir = dirs.get_transfer_data_dir(bot_id, 2)
+            print("READING VALIDATION DATA FROM: %s" % training_data_dir)
+    else:
+        training_data_dir = dirs.get_training_data_dir(bot_id)
+        print("READING TRAINING DATA FROM: %s" % training_data_dir)
 
     if not bot_id:
         raise ValueError('bot id not recognized from dataset_dir %s' % dataset_dir)
 
+    split_frac = 0.1
+
+    if split_name == 'train' and setting_id >= 9:
+        split_frac = 0.0
+
     split_size = dataset_utils.get_split_size(
-        training_data_dir, split_name, _SPLIT_FRAC
+        training_data_dir, split_name, split_frac
     )
 
     print("SPLIT SIZE: %s" % split_size)
