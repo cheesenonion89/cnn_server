@@ -7,12 +7,15 @@ from shutil import rmtree
 import cnn_server.server.file_service as dirs
 from slim.datasets import convert_to_protobuf as converter
 
+'''
+Interacts with the slim and the server package to maintain directories and training data for bots
+'''
+
 
 def validate_training_data(file):
     """
-    
-    :param path: 
-    :return: 
+    validate that the file structure is correct i.e. that it is zip, with images organized in subfolder representing the
+    classes
     """
     if not zipfile.is_zipfile(file):
         return False
@@ -60,10 +63,6 @@ def validate_training_data(file):
 def create_training_data_dir(bot_id: int, training_data_file):
     """
     Verify that the files training data directory is there and empty and write the zipped training data to it.
-    
-    :param bot_id: 
-    :param zip_file: 
-    :return: 
     """
     bot_training_dir = dirs.get_training_data_dir(bot_id)
 
@@ -83,10 +82,8 @@ def create_training_data_dir(bot_id: int, training_data_file):
 
 def write_to_protobuffer(bot_id: int):
     """
-    
-    :param bot_id: 
-    :param net: 
-    :return: 
+    Read the data from the training data directory, convert them to protobuffer format and write them to the protobuffer
+    directory
     """
 
     bot_training_data_dir = dirs.get_training_data_dir(bot_id)
@@ -105,6 +102,9 @@ def write_to_protobuffer(bot_id: int):
 
 
 def delete_bot_data(bot_id):
+    """
+    Delete all data of a bot in the filesystem if it exists
+    """
     training_data_dir = dirs.get_training_data_dir(bot_id)
     protobuf_dir = dirs.get_protobuf_dir(bot_id)
     model_dir = dirs.get_model_data_dir(bot_id)

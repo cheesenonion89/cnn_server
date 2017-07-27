@@ -18,6 +18,12 @@ MAX_NUM_BATCHES = None
 EVAL_IMAGE_SIZE = None
 NUM_THREADS = 4
 
+'''
+Logic to evaluate the performance of a classifier.
+The function eval() can be called from another script with the bot_id to point the the to be evaluated.
+e.g. eval('root') runs the evaluation on the root model. The results are written to the console.
+'''
+
 
 def _check_dir(dir_path):
     if not dir_path:
@@ -28,7 +34,7 @@ def _check_dir(dir_path):
         raise ValueError('%s is empty' % dir_path)
 
 
-def eval(bot_id, bot_suffix, setting_id=None, validation_setting=2, dataset_split='validation', dataset_name='bot',
+def eval(bot_id, bot_suffix='', setting_id=None, validation_setting=2, dataset_split='validation', dataset_name='bot',
          model_name='inception_v4',
          preprocessing=None,
          moving_average_decay=None, tf_master=''):

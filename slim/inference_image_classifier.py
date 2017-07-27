@@ -1,5 +1,6 @@
 import multiprocessing
 from multiprocessing import Manager
+
 import os
 import tensorflow as tf
 
@@ -40,15 +41,11 @@ def inference_on_image(bot_id, image_file, network_name='inception_v4', return_l
     Workaround: Run inference in a dedicated thread to release GPU resources occupied by tensorflow after computation.
     Otherwise, the GPU will be blocked for the next inference, resulting in an error. This workaround avoids restarting
     the server after each inference.
-    :param bot_id: 
-    :param image_file: 
-    :param network_name: 
-    :param return_labels: 
-    :return: 
     """
     manager = Manager()
     prediction_dict = manager.dict()
-    process = multiprocessing.Process(target=infere, args=(bot_id, image_file, network_name, return_labels, prediction_dict))
+    process = multiprocessing.Process(target=infere,
+                                      args=(bot_id, image_file, network_name, return_labels, prediction_dict))
     process.start()
     process.join()
     print(prediction_dict)
@@ -64,7 +61,9 @@ def infere(bot_id, image_file, network_name='inception_v4', return_labels=None, 
     :param network_name: name of the network type to be used
     :param return_labels: number of labels to return
     :return: the top n labels with probabilities, where n = return_labels
-    """  # Get the model path
+    """
+
+    # Get the model path
     model_path = dirs.get_model_data_dir(bot_id)
 
     # Get number of classes to predict
@@ -104,6 +103,4 @@ def infere(bot_id, image_file, network_name='inception_v4', return_labels=None, 
         # Get the numpy array of predictions out of the
         predictions = endpoints['Predictions'].eval()[0]
         sess.close()
-        graph = endpoints['Predictions'].graph
-        print("")
         prediction_dict['predictions'] = map_predictions_to_labels(protobuf_dir, predictions, return_labels)

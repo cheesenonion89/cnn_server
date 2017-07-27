@@ -1,20 +1,20 @@
 import math
+import multiprocessing
 import sys
 
 import os
 import random
-import multiprocessing
 import tensorflow as tf
 
 from slim.datasets import dataset_utils
 
-_FRACT_VALIDATION = 0.2
-_NUM_SHARDS = 1
-_RANDOM_SEED = 0
+_FRACT_VALIDATION = 0.2  # Percent of test data to set aside
+_NUM_SHARDS = 1  # Number of shards for parallel processing
+_RANDOM_SEED = 0  # Seed for random number generation
 
 
 class ImageReader(object):
-    """Helper class that provides TensorFlow image coding utilities."""
+    """Helper class that provides TensorFlow image encoding utilities."""
 
     def __init__(self):
         # Initializes function that decodes RGB JPEG data.
@@ -76,12 +76,8 @@ def _get_filenames_and_classes(training_data_dir, fract_validation):
 
 def _convert_dataset(split_name, filenames, class_names_to_ids, protobuf_dir, num_shards):
     """
-
-    :param split_name: 
-    :param filenames: 
-    :param class_names_to_ids: 
-    :param protobuf_dir: 
-    :return: 
+    Creates a tensorflow session that converts the raw training data into tfrecord format. Splits the data into training 
+    and validation and multiple shards for potential parallel processing.
     """
     assert split_name in ['train', 'validation']
 
@@ -125,12 +121,10 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, protobuf_dir, nu
 
 def run(training_data_dir, protobuf_dir, fract_validation=_FRACT_VALIDATION, num_shards=_NUM_SHARDS):
     """
-    
-    :param training_data_dir: 
-    :param protobuf_dir: 
-    :param fract_validation: 
-    :param num_shards: 
-    :return: 
+    Assembles information necessary to convert the training data files and starts the conversion of training and test set.
+    The conversion needs to be wrapped in dedicated threads as a workaround to release GPU resources again after the 
+    conversion is done. If tensorflow is started from the main thread, it will occupy the GPU until the main thread 
+    terminates.
     """
     if not tf.gfile.Exists(protobuf_dir):
         tf.gfile.MakeDirs(protobuf_dir)
@@ -139,10 +133,14 @@ def run(training_data_dir, protobuf_dir, fract_validation=_FRACT_VALIDATION, num
         print('Dataset files already exist. Exiting without re-creating them.')
         return
 
+    # Parse information encoded in the structure of the training data directory
     training_filenames, validation_filenames, class_names = _get_filenames_and_classes(training_data_dir,
                                                                                        fract_validation)
+
+    # Convert class names into numerical ids for processing in tensorflow
     class_names_to_ids = dict(zip(class_names, range(len(class_names))))
 
+    # Randomly shuffle the data sets again
     random.seed(_RANDOM_SEED)
     random.shuffle(training_filenames)
     random.shuffle(validation_filenames)
@@ -154,7 +152,9 @@ def run(training_data_dir, protobuf_dir, fract_validation=_FRACT_VALIDATION, num
     process.join()
 
     process = multiprocessing.Process(target=_convert_dataset,
-                                      args=('validation', validation_filenames, class_names_to_ids, protobuf_dir, num_shards))
+                                      args=(
+                                          'validation', validation_filenames, class_names_to_ids, protobuf_dir,
+                                          num_shards))
     process.start()
     process.join()
 
@@ -162,5 +162,4 @@ def run(training_data_dir, protobuf_dir, fract_validation=_FRACT_VALIDATION, num
     labels_to_class_names = dict(zip(range(len(class_names)), class_names))
     dataset_utils.write_label_file(labels_to_class_names, protobuf_dir)
 
-    # _clean_up_temporary_files(dataset_dir)
     print('\nFinished converting the dataset!')

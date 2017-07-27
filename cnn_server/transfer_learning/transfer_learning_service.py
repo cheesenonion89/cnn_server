@@ -3,6 +3,10 @@ import os
 import slim.transfer_image_classifier as transfer_learning
 from cnn_server.server import file_service as dirs
 
+'''
+Interacts with the slim package and the file service to start the transfer learning with the correct root model, the 
+correct training data and write the resulting model back to the correct folder in \model
+'''
 
 def train(bot_id, test=False, max_train_time=None):
     if test:

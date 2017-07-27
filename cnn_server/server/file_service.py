@@ -15,6 +15,11 @@ INFERENCE_DATA_DIR = os.path.join(PROJECT_ROOT_DIR, 'inference_data')
 
 FOLDER_PREFIX = 'bot'
 
+'''
+Utility functions to work on the file system. Contains additional functions that have been used for the execution of 
+experiments.
+'''
+
 
 def folder_name(bot_id):
     return '%s_%s/' % (FOLDER_PREFIX, bot_id)

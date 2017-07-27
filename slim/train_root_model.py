@@ -3,6 +3,10 @@ import os
 import slim.transfer_image_classifier as trainer
 from cnn_server.server import file_service as dirs
 
+'''
+Logic to train the CNN cars model. Result is written to model/bot_root. Make sure no other model is there before running.
+'''
+
 
 def train():
     protobuf_dir = dirs.get_protobuf_dir('root')  # Read the protobuffer files for the initial car dataset
@@ -27,6 +31,6 @@ def train():
 
     trainer.train(bot_model_dir=bot_model_dir,
                   protobuf_dir=protobuf_dir,
-                  max_train_time_sec=(60 * 60 * 24 * 7),
+                  max_train_time_sec=(60 * 60 * 24 * 7),  # Adjust training time here.
                   optimization_params=None,
                   log_every_n_steps=10)

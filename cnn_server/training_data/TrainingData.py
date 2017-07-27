@@ -3,15 +3,16 @@ from flask_restful import Resource
 
 from cnn_server.training_data import training_data_receive_handler as handler
 
+'''
+HTTP Endpoints for the upload of training data
+'''
+
 
 class TrainingData(Resource):
     def put(self, bot_id: int):
-        """
-        
-        :param bot_id: 
-        :return: 
-        """
+
         print("PUT RECEIVED FOR BOT %s" % bot_id)
+
         try:
             int(bot_id)
         except ValueError:
@@ -29,12 +30,9 @@ class TrainingData(Resource):
         return handler.handle_put(bot_id, training_data_file)
 
     def delete(self, bot_id):
-        """
-        
-        :param bot_id: 
-        :return: 
-        """
+
         print("DELETE RECEIVED FOR BOT %s" % bot_id)
+
         try:
             int(bot_id)
         except ValueError:
@@ -42,5 +40,3 @@ class TrainingData(Resource):
             return "Invalid bot ID format. Expected integer value", 400
 
         handler.handle_delete(bot_id)
-
-

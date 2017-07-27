@@ -1,14 +1,15 @@
 from cnn_server.training_data import training_data_service
-from shutil import rmtree
+
+'''
+Provides functionality to create/delete training data and protobuffer files in the file system
+Training data is stored in cnn_server/training_data
+Protbuffer are stroed in ccn_server/protobuf
+'''
 
 
 def handle_put(bot_id: int, training_data_file: str):
     """
-    
-    :param bot_id: 
-    :param training_data_file: 
-    :param net: 
-    :return: 
+    Store uploaded training data in the corresponding directory and convert them to tfrecord format
     """
 
     # TODO: check if request_body is valid and redirect to training_data_service
@@ -28,9 +29,6 @@ def handle_put(bot_id: int, training_data_file: str):
 
 def handle_delete(bot_id):
     """
-    
-    :param bot_id: 
-    :return: 
+    Delete training data, protobuffer and models if they exist
     """
     return training_data_service.delete_bot_data(bot_id)
-

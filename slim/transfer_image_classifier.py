@@ -99,6 +99,10 @@ OPTIMIZATION_PARAMS = {
     'dropout_keep_prob': _DROPOUT_KEEP_PROB
 }
 
+'''
+Functionality for transfer learning and training of new models
+'''
+
 
 def _configure_learning_rate(num_samples_per_epoch, global_step):
     """
@@ -134,6 +138,7 @@ def _configure_learning_rate(num_samples_per_epoch, global_step):
                          OPTIMIZATION_PARAMS['learning_rate_decay_type'])
 
 
+# Configuration of the optimizer by given Hyperparameters
 def _configure_optimizer(learning_rate):
     """
     
@@ -180,13 +185,8 @@ def _configure_optimizer(learning_rate):
     return optimizer
 
 
+# Initialization of the tensorflow graph
 def _get_init_fn(root_model_dir, bot_model_dir, checkpoint_exclude_scopes):
-    """
-    
-    :param model_dir: 
-    :param protobuf_dir: 
-    :return: 
-    """
     if root_model_dir is None:
         return None
 
@@ -227,6 +227,7 @@ def _get_init_fn(root_model_dir, bot_model_dir, checkpoint_exclude_scopes):
         ignore_missing_vars=_IGNORE_MISSING_VARS)
 
 
+# Assembles the variables to that should be trained based on the provided variable scope
 def _get_variables_to_train(trainable_scopes):
     """
     
@@ -244,7 +245,7 @@ def _get_variables_to_train(trainable_scopes):
     return variables_to_train
 
 
-# Remove number of steps from .learn call and define own kwargs
+# Assemble parameters to pass to the optimizer for the training process
 def _train_step_kwargs(logdir, max_train_time_seconds=_MAX_TRAIN_TIME_SECONDS, should_log=True,
                        log_every_n_steps=_LOG_EVERY_N_STEPS,
                        should_trace=False):
@@ -332,20 +333,6 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
     called from the main thread, tensorflow will occupy the GPU until the main thread i.e. the server is restarted.
     Without this workaround, another process, such as a prediction cannot be performed directly after training, without
     restarting the server
-    :param root_model_dir: 
-    :param bot_model_dir: 
-    :param protobuf_dir: 
-    :param model_name: 
-    :param dataset_split_name: 
-    :param dataset_name: 
-    :param checkpoint_exclude_scopes: 
-    :param trainable_scopes: 
-    :param max_train_time_sec: 
-    :param max_number_of_steps: 
-    :param log_every_n_steps: 
-    :param save_summaries_secs: 
-    :param optimization_params: 
-    :return: 
     """
     process = multiprocessing.Process(
         target=run_transfer_learning,
@@ -378,6 +365,7 @@ def run_transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_nam
                           save_summaries_secs=None,
                           optimization_params=None):
     """
+    Starts the transfer learning of a model in a tensorflow session
     :param root_model_dir: Directory containing the root models pretrained checkpoint files
     :param bot_model_dir: Directory where the transfer learned model's checkpoint files are written to
     :param protobuf_dir: Directory for the dataset factory to load the bot's training data from
@@ -388,8 +376,9 @@ def run_transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_nam
     :param trainable_scopes: Layers to train from the restored model
     :param max_train_time_sec: time boundary to stop training after in seconds
     :param max_number_of_steps: maximum number of steps to run
-    :param log_every_n_steps:
-    :param optimization_params:
+    :param log_every_n_steps: write a log after every nth optimization step
+    :param save_summaries_secs: save summaries to disc every n seconds
+    :param optimization_params: parameters for the optimization
     :return: 
     """
     if not optimization_params:
@@ -603,6 +592,12 @@ def run_transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_nam
             sync_optimizer=optimizer if _SYNC_REPLICAS else None)
 
 
+'''
+Method for training from scratch. Simply calls transfer learning without root model to load weights from. Mainly 
+used for experiments
+'''
+
+
 def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inception_v4',
           dataset_split_name='train',
           dataset_name='bot',
@@ -611,20 +606,6 @@ def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inceptio
           log_every_n_steps=None,
           save_summaries_secs=None,
           optimization_params=None):
-    """
-
-        :param root_model_dir: Directory containing the root models pretrained checkpoint files
-        :param bot_model_dir: Directory where the transfer learned model's checkpoint files are written to
-        :param protobuf_dir: Directory for the dataset factory to load the bot's training data from
-        :param model_name: network model for the net factory to provide the correct network and preprocesing fn
-        :param dataset_split_name: 'train' or 'validation'
-        :param dataset_name: triggers the dataset factory to load a bot dataset
-        :param max_train_time_sec:
-        :param max_number_of_steps:
-        :parap log_every_n_steps:
-        :param OPTIMIZATION_PARAMS: 
-        :return: 
-    """
     print("""
             INITIALIZING TRAINING OF \t %s\n
             READING PROTOBUF FROM: \t %s \n
@@ -646,7 +627,3 @@ def train(bot_model_dir, protobuf_dir, root_model_dir=None, model_name='inceptio
                       optimization_params=None,
                       save_summaries_secs=save_summaries_secs,
                       log_every_n_steps=log_every_n_steps)
-
-
-if __name__ == '__main__':
-    tf.app.run()

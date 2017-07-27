@@ -4,6 +4,9 @@ import cnn_server.classification.classification_service as service
 
 
 class ClassificationResult:
+    """
+    Domain class that provides the data structure to send back to the sender
+    """
     def __init__(self, labels, probabilities):
         self.labels = labels
         self.probabilities = probabilities
