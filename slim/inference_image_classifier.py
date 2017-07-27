@@ -35,7 +35,17 @@ def map_predictions_to_labels(protobuf_dir, predictions, return_labels=None):
     return lbls, probabilities
 
 
-def inference_on_image(bot_id, image_file, network_name='inception_v4', return_labels=1):
+def inference_on_image(bot_id, image_file, network_name='inception_v4', return_labels=None):
+    """
+    Workaround: Run inference in a dedicated thread to release GPU resources occupied by tensorflow after computation.
+    Otherwise, the GPU will be blocked for the next inference, resulting in an error. This workaround avoids restarting
+    the server after each inference.
+    :param bot_id: 
+    :param image_file: 
+    :param network_name: 
+    :param return_labels: 
+    :return: 
+    """
     manager = Manager()
     prediction_dict = manager.dict()
     process = multiprocessing.Process(target=infere, args=(bot_id, image_file, network_name, return_labels, prediction_dict))
@@ -45,7 +55,7 @@ def inference_on_image(bot_id, image_file, network_name='inception_v4', return_l
     return prediction_dict['predictions']
 
 
-def infere(bot_id, image_file, network_name='inception_v4', return_labels=1, prediction_dict=[]):
+def infere(bot_id, image_file, network_name='inception_v4', return_labels=None, prediction_dict=[]):
     """
     Loads the corresponding model checkpoint, network function and preprocessing routine based on bot_id and network_name,
     restores the graph and runs it to the prediction enpoint with the image as input
@@ -60,6 +70,9 @@ def infere(bot_id, image_file, network_name='inception_v4', return_labels=1, pre
     # Get number of classes to predict
     protobuf_dir = dirs.get_protobuf_dir(bot_id)
     number_of_classes = dataset_utils.get_number_of_classes_by_labels(protobuf_dir)
+
+    if not return_labels:
+        return_labels = number_of_classes
 
     # Get the preprocessing and network construction functions
     preprocessing_fn = preprocessing_factory.get_preprocessing(network_name, is_training=False)
@@ -92,5 +105,5 @@ def infere(bot_id, image_file, network_name='inception_v4', return_labels=1, pre
         predictions = endpoints['Predictions'].eval()[0]
         sess.close()
         graph = endpoints['Predictions'].graph
-
+        print("")
         prediction_dict['predictions'] = map_predictions_to_labels(protobuf_dir, predictions, return_labels)

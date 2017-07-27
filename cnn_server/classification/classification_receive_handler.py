@@ -12,7 +12,7 @@ class ClassificationResult:
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
-def handle_post(bot_id, image, return_labels=1):
+def handle_post(bot_id, image, return_labels=None):
     """
     Expects the bot id and the byte representation of a base64 encoded image, parsed from the incoming http POST
     :param bot_id: the id of the bot, whose CNN is to be referenced

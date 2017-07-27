@@ -3,6 +3,7 @@ import sys
 
 import os
 import random
+import multiprocessing
 import tensorflow as tf
 
 from slim.datasets import dataset_utils
@@ -146,8 +147,16 @@ def run(training_data_dir, protobuf_dir, fract_validation=_FRACT_VALIDATION, num
     random.shuffle(training_filenames)
     random.shuffle(validation_filenames)
 
-    _convert_dataset('train', training_filenames, class_names_to_ids, protobuf_dir, num_shards)
-    _convert_dataset('validation', validation_filenames, class_names_to_ids, protobuf_dir, num_shards)
+    # Workaround to release GPU resources after running tensorflow
+    process = multiprocessing.Process(target=_convert_dataset,
+                                      args=('train', training_filenames, class_names_to_ids, protobuf_dir, num_shards))
+    process.start()
+    process.join()
+
+    process = multiprocessing.Process(target=_convert_dataset,
+                                      args=('validation', validation_filenames, class_names_to_ids, protobuf_dir, num_shards))
+    process.start()
+    process.join()
 
     # Finally, write the labels file:
     labels_to_class_names = dict(zip(range(len(class_names)), class_names))

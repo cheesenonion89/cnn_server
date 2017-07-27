@@ -1,3 +1,4 @@
+import multiprocessing
 import time
 
 import os
@@ -326,6 +327,56 @@ def transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='i
                       log_every_n_steps=None,
                       save_summaries_secs=None,
                       optimization_params=None):
+    """
+    Workaround: Start transfer learning in a thread that terminates after finishing the learning. If the training is 
+    called from the main thread, tensorflow will occupy the GPU until the main thread i.e. the server is restarted.
+    Without this workaround, another process, such as a prediction cannot be performed directly after training, without
+    restarting the server
+    :param root_model_dir: 
+    :param bot_model_dir: 
+    :param protobuf_dir: 
+    :param model_name: 
+    :param dataset_split_name: 
+    :param dataset_name: 
+    :param checkpoint_exclude_scopes: 
+    :param trainable_scopes: 
+    :param max_train_time_sec: 
+    :param max_number_of_steps: 
+    :param log_every_n_steps: 
+    :param save_summaries_secs: 
+    :param optimization_params: 
+    :return: 
+    """
+    process = multiprocessing.Process(
+        target=run_transfer_learning,
+        args=(
+            root_model_dir, bot_model_dir, protobuf_dir,
+            model_name,
+            dataset_split_name,
+            dataset_name,
+            checkpoint_exclude_scopes,
+            trainable_scopes,
+            max_train_time_sec,
+            max_number_of_steps,
+            log_every_n_steps,
+            save_summaries_secs,
+            optimization_params
+        )
+    )
+    process.start()
+    process.join()
+
+
+def run_transfer_learning(root_model_dir, bot_model_dir, protobuf_dir, model_name='inception_v4',
+                          dataset_split_name='train',
+                          dataset_name='bot',
+                          checkpoint_exclude_scopes=None,
+                          trainable_scopes=None,
+                          max_train_time_sec=None,
+                          max_number_of_steps=None,
+                          log_every_n_steps=None,
+                          save_summaries_secs=None,
+                          optimization_params=None):
     """
     :param root_model_dir: Directory containing the root models pretrained checkpoint files
     :param bot_model_dir: Directory where the transfer learned model's checkpoint files are written to

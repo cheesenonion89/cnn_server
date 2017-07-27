@@ -11,27 +11,36 @@ class TrainingData(Resource):
         :param bot_id: 
         :return: 
         """
-        print("PUT RECEIVED")
+        print("PUT RECEIVED FOR BOT %s" % bot_id)
         try:
             int(bot_id)
         except ValueError:
             print("Invalid bot ID format. Expected integer value")
             return "Invalid bot ID format. Expected integer value", 400
-        """
-        if not request.files['file']:
-            return "Training Data File is missing", 400
 
-        if not request.form['net']:
-            return "CNN Identifier is missing", 400
-
-        
-        # net = request.form['net']
-        """
-        r = request
-        print(request)
         training_data_file = request.files['file']
-        print("GOT TRAINING DATA")
+
         if not training_data_file:
+            print("Training Data File is missing")
             return "Training Data File is missing", 400
+
+        print("GOT TRAINING DATA FOR BOT %s" % bot_id)
 
         return handler.handle_put(bot_id, training_data_file)
+
+    def delete(self, bot_id):
+        """
+        
+        :param bot_id: 
+        :return: 
+        """
+        print("DELETE RECEIVED FOR BOT %s" % bot_id)
+        try:
+            int(bot_id)
+        except ValueError:
+            print("Invalid bot ID format. Expected integer value")
+            return "Invalid bot ID format. Expected integer value", 400
+
+        handler.handle_delete(bot_id)
+
+

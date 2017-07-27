@@ -18,4 +18,4 @@ api.add_resource(Classifier, '/classify/<bot_id>')
 api.add_resource(Server, '/status')
 
 if __name__ == "__main__":
-	app.run('0.0.0.0')
+    app.run('0.0.0.0')
